@@ -3,9 +3,9 @@
 ## 1. Overview & Network Topology
 * Brief description of the hybrid transport plane.
 * Visual/Textual Subnet & IP Map:
-  * `DC01` (10.0.2.2) - AD DS / DNS / PKI
-  * `ENTRA-SYNC01` (10.0.2.3) - Dedicated Sync Host
-  * `MGMT01` (10.0.2.4) - Windows 11 Admin PAW
+  * `DC01` (10.0.2.4) - AD DS / DNS / PKI
+  * `ENTRA-SYNC01` (10.0.2.5) - Dedicated Sync Host
+  * `MGMT01` (10.0.2.6) - Windows 11 Admin PAW
 * Zero-Trust Boundary Statement: No inbound ports exposed to public transport. All cloud telemetry uses outbound-initiated HTTPS/TLS connections.
 
 ## 2. Firewall Egress & Traffic Matrix

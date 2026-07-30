@@ -36,3 +36,19 @@ A **7-minute, 10-second timestamp variance** was isolated between `ENTRA-SYNC01`
 * **Root Cause:** Hypervisor integration services induced forward clock drift on `DC01`.
 * **Technical Note:** Under healthy, synchronized conditions, this delta is `< 2 seconds`. 
 * **Remediation:** Disabled Hyper-V time synchronization and bound `DC01` to an external authoritative NTP stratum (`time.windows.com`).
+
+## 4. Artifacts
+
+* 📄 **Entra Audit Log:** [`entra-audit-log.csv`](./entra-audit-log.csv)
+* 📄 **Sync Agent Events:** [`sync-server-events.txt`](./sync-server-events.txt)
+* 📄 **Active Directory Output:** [`dc01-pwdlastset-proof.txt`](./dc01-pwdlastset-proof.txt)
+
+---
+
+### Visual Evidence
+
+#### Entra ID Audit Log Confirmation
+![Entra SSPR Audit Log](./images/entra-audit-log.png)
+
+#### Synchronization Service Manager Export Pass
+![miisclient Export Summary](./images/miisclient-export.png)

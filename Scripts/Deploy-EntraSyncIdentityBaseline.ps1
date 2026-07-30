@@ -92,9 +92,6 @@ if (-not $ExistingUser) {
 Write-Host "[+] Restricting logon paths for $AccountName to ENTRA-SYNC01 and DC01..." -ForegroundColor Cyan
 Set-ADUser -Identity $AccountName -LogonWorkstations "ENTRA-SYNC01,DC01"
 
-Write-Host "[+] Adding $AccountName to Tier-0 Protected Users group..." -ForegroundColor Cyan
-Add-ADGroupMember -Identity "Protected Users" -Members $AccountName -ErrorAction SilentlyContinue
-
 # Export encrypted credential XML for staging
 $ExportDir = if ($PSScriptRoot) { $PSScriptRoot } else { "C:\Users\Administrator\Downloads" }
 $CredentialPath = Join-Path -Path $ExportDir -ChildPath "svc-entrasync-cred.xml"

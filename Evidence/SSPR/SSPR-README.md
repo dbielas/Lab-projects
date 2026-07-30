@@ -48,7 +48,7 @@ A **7-minute, 10-second timestamp variance** was isolated between `ENTRA-SYNC01`
 ### Visual Evidence
 
 #### Entra ID Audit Log Confirmation
-![Entra SSPR Audit Log](./images/entra-audit-log.png)
+![entra-audit-log](./SSPR_Audit.jpg)
 
-#### Synchronization Service Manager Export Pass
-![miisclient Export Summary](./images/miisclient-export.png)
+#### Entra User License Confirmation
+![SSPR_License](./SSPR_License.jpg)

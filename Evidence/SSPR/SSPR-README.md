@@ -17,7 +17,7 @@ This directory contains end-to-end evidence validating Self-Service Password Res
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Trigger** | Entra ID Portal | [entra-audit-log])(./SSPR_Audit.jpg) | Status: `Success` (`OnPremisesPasswordWriteBackSuccess`) |
+| **1. Trigger** | Entra ID Portal | [entra-audit-log](./SSPR_Audit.jpg) | Status: `Success` (`OnPremisesPasswordWriteBackSuccess`) |
 | **2. Handshake** | `ENTRA-SYNC01` | `sync-server-events.txt` | Event ID `31001` (`PasswordResetRequestStart`) at `10:21:09 AM` |
 | **3. Execution** | `ENTRA-SYNC01` | `sync-server-events.txt` | Event ID `31002` (`PasswordResetSuccess`) at `10:21:09 AM` |
 | **4. Finality** | `DC01` | `dc01-pwdlastset-proof.txt` | `pwdLastSet` updated to `10:28:19 AM` |

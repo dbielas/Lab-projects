@@ -43,8 +43,6 @@ A **7-minute, 10-second timestamp variance** was isolated between `ENTRA-SYNC01`
 * 📄 **Sync Agent Events:** [`sync-server-events.txt`](./sync-server-events.txt)
 * 📄 **Active Directory Output:** [`dc01-pwdlastset-proof.txt`](./dc01-pwdlastset-proof.txt)
 
----
-
 ### Visual Evidence
 
 #### Entra ID Audit Log Confirmation

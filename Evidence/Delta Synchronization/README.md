@@ -52,4 +52,4 @@ By default, standard object read/write delegation commands do not automatically 
 Applied property-specific write permissions directly to the target organizational unit (`OU=Users`) targeting descendant `user` objects:
 
 ```cmd
-dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entra-sync":WP;mS-DS-ConsistencyGuid;user
+dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entrasync:WP;mS-DS-ConsistencyGuid;user"

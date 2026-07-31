@@ -6,7 +6,7 @@ This directory contains end-to-end evidence validating Password Hash Synchroniza
 ---
 
 ## 1. Test Metadata
-* **Target Account:** `testuser2@davidbielascomcast.onmicrosoft.com`
+* **Target Account:** `amercer@davidbielascomcast.onmicrosoft.com`
 * **Service Principal:** `ConnectSyncProvisioning_ENTRA-SYNC01_e72762af8e46`
 * **Sync Server:** `ENTRA-SYNC01`
 * **Domain Controller:** `DC01`

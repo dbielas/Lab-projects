@@ -20,7 +20,7 @@ This directory contains end-to-end evidence validating Password Hash Synchroniza
 | **1. Local Reset** | `DC01` | [dc01-phs-reset](./dc01-phs-reset.txt) | `Set-ADAccountPassword` executed; `pwdLastSet` updated |
 | **2. Engine Harvest** | `ENTRA-SYNC01` | `sync-diagnostics.png` | `Invoke-ADSyncDiagnostics -DiagnosticName PasswordHashSync` returned `Success` |
 | **3. Processing** | `ENTRA-SYNC01` | `phs-operational-event.png` | Local batch extracted and hashed via HMAC-SHA256 |
-| **4. Cloud Ingestion** | Entra ID Portal | `entra-audit-log.png` | Status: `Success` (`Update PasswordProfile`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
+| **4. Cloud Ingestion** | Entra ID Portal | [entra-audit-log](./entra-audit-log.csv) | Status: `Success` (`Update PasswordProfile`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
 
 ---
 

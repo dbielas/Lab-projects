@@ -18,7 +18,7 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Source Update** | `DC01` | `dc01-attribute-update.png` | Executed `Set-ADUser`; updated `Title` and `Department` attributes |
+| **1. Source Update** | `DC01` | [dc01-attribute-update](./dc01-attribute-update.txt) | Executed `Set-ADUser`; updated `Title` and `Department` attributes |
 | **2. Delta Engine Trigger** | `ENTRA-SYNC01` | `delta-sync-trigger.png` | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; result: `Success` |
 | **3. Engine Execution** | `ENTRA-SYNC01` | `miisclient-delta-step.png` | `miisclient.exe` showing `Delta Import` and `Delta Sync` completed with `Updates: 1` |
 | **4. Cloud Reflection** | Entra ID Portal | `entra-audit-delta-update.png` | Status: `Success` (`Update user`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |

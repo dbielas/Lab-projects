@@ -1,0 +1,6 @@
+========================================
+PHS TEST RECORD - ON-PREM RESET
+Execution Time : 2026-07-30 17:53:43
+User Target    : amercer
+AD pwdLastSet  : 07/30/2026 17:53:43
+========================================

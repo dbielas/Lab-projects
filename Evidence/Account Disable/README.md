@@ -1,7 +1,7 @@
-# Delta Synchronization & Identity Lifecycle Validation
+# Account Disable & Deprovisioning Lifecycle Validation
 
 ## Executive Summary
-This directory contains end-to-end evidence validating standard Delta Synchronization functionality and object lifecycle management from on-premises Active Directory (`DC01`) to Microsoft Entra ID via Entra Connect (`ENTRA-SYNC01`). It demonstrates routine attribute propagation, account deprovisioning (soft delete), and custom service account permission remediation.
+This directory contains end-to-end evidence validating on-premises account disabling and cloud identity deprovisioning from Active Directory (`DC01`) to Microsoft Entra ID via Entra Connect (`ENTRA-SYNC01`). It demonstrates how modifying the on-premises `userAccountControl` attribute triggers automated cloud state updates (`accountEnabled: false`) and enforces instant access revocation patterns across hybrid identity boundaries.
 
 ---
 
@@ -10,8 +10,8 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 * **Service Principal:** `ConnectSyncProvisioning_ENTRA-SYNC01_e72762af8e46`
 * **Sync Server:** `ENTRA-SYNC01`
 * **Domain Controller:** `DC01`
-* **Updated Attributes:** `Title` ("Systems Administrator" → "Intelligence Analyst"), `Department` ("IT" → "Cybersecurity")
-* **Lifecycle Events Validated:** Attribute Delta Sync, Account Disable / Cloud Soft-Delete
+* **Target Attribute:** `userAccountControl` (Bitflag `514` / `ACCOUNTDISABLE`)
+* **Cloud State Change:** `accountEnabled` (`true` $\rightarrow$ `false`)
 
 ---
 
@@ -19,34 +19,39 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. Source Update** | `DC01` | [dc01-attribute-update.txt](./dc01-attribute-update.txt) | Executed `Set-ADUser`; updated `Title` and `Department` attributes on `amercer`. |
-| **02. Delta Engine Trigger** | `ENTRA-SYNC01` | [delta-sync-trigger.jpg](./delta-sync-trigger.jpg) | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; result: `Success`. |
-| **03. Delta Export Verification** | `ENTRA-SYNC01` | [Delta-Sync-Attribute-Export.jpg](./Delta-Sync-Attribute-Export.jpg) | Captured `Connector Space Object Properties` during Delta Export. Confirmed attribute updates staged and pushed via verified `mS-DS-ConsistencyGuid` anchor. |
-| **04. Cloud Reflection** | Entra ID Portal | [entra-audit-delta-update.jpg](./entra-audit-delta-update.jpg) | Status: `Success` (`Update user`) initiated by `ConnectSyncProvisioning_*`. Verified `Department` and `JobTitle` diffs. |
-| **05. Account Deprovisioning** | `DC01` & Entra ID | [entra-soft-delete-audit.jpg](./entra-soft-delete-audit.jpg) | Executed `Disable-ADAccount`. Verified `accountEnabled` set to `False` (`accountEnabled: true → false`) and target account soft-deleted/disabled in Entra ID. |
+| **01. On-Premises Disable** | `DC01` | `dc01-account-disable.txt` | Executed `Disable-ADAccount`; updated `userAccountControl` bitmask to include `ACCOUNTDISABLE` (`514`). |
+| **02. Delta Engine Execution** | `ENTRA-SYNC01` | `delta-sync-trigger.jpg` | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; engine staged `userAccountControl` modifications in AD Connector Space. |
+| **03. Delta Export Staging** | `ENTRA-SYNC01` | `miisclient-export-disable.jpg` | Verified `Connector Space Object Properties` during Delta Export. Confirmed `accountEnabled` attribute transform staged from `true` to `false`. |
+| **04. Entra ID Audit Log** | Entra ID Portal | `entra-audit-account-disable.jpg` | Verified `Disable account` / `Update user` event under Core Directory audit logs. Confirmed `accountEnabled: false` property diff. |
+| **05. Token & Access Revocation** | Entra ID Portal | `entra-user-state-disabled.jpg` | Verified global account status set to **Disabled** in Entra ID Admin Center, blocking primary authentication and session refreshes. |
 
 ---
 
-## 3. Deep-Dive Analysis: Engine Pipeline & Attribute Scoping
+## 3. Deep-Dive Analysis: Disable Mechanics & State Engine
 
-### Delta Import & Staging Mechanics
-When a Delta Sync cycle runs, Entra Connect queries local AD domain controllers using high-watermark USN (Update Sequence Number) tracking to isolate modified objects rather than performing a full directory read.
-* **Connector Space (CS) Staging:** Changes are staged in the local AD Connector Space before evaluating synchronization rules.
-* **Metaverse (MV) Transformation:** Attribute mapping rules (e.g., `In from AD - User Common`) translate local Active Directory attributes (`title`, `department`, `userAccountControl`) to their metaverse equivalents (`jobTitle`, `department`, `accountEnabled`).
-* **Export Cycle:** Transmitted over TLS 1.2 via the Graph/Provisioning endpoint using the tenant's dedicated service principal (`ConnectSyncProvisioning_*`).
+### On-Premises Flag Evaluation
+In Active Directory, disabling an account modifies the `userAccountControl` bitmask property:
+* **Active User Bitmask:** Typically `512` (`NORMAL_ACCOUNT`)
+* **Disabled User Bitmask:** Updated to `514` (`NORMAL_ACCOUNT` + `ACCOUNTDISABLE`)
+
+### Sync Engine Transformation Logic
+During the Delta Synchronization cycle, Entra Connect evaluates the bitwise flag via outbound sync rules:
+1. **Inbound Rule (`In from AD - User Common`):** Translates the raw bitmask `userAccountControl` property into a boolean metaverse attribute: `accountEnabled`.
+2. **Metaverse Evaluation:** If `(userAccountControl & 2) == 2`, `accountEnabled` is set to `False`.
+3. **Outbound Rule (`Out to AAD - User Join`):** Exports the boolean `accountEnabled: false` state via Graph API to the target Entra tenant.
+
+### Security Impact & Session Invalidation
+When `accountEnabled` flips to `false` in Entra ID:
+* **Interactive Auth:** Immediate blockage of new Interactive Logins (Modern Auth / Basic Auth).
+* **Token Invalidation:** Triggers Continuous Access Evaluation (CAE) checks to revoke active Refresh Tokens, revoking session access across M365/Entra-integrated applications.
 
 ---
 
-## 4. Engineering Post-Mortem: Custom Service Account Remediation (Error 8344)
+## 4. Operational Considerations & Scope Management
 
-### Problem Statement
-During initial deployment, utilizing a pre-provisioned custom AD Connector service account (`DOMAIN\svc-entra-sync`) resulted in export failures (`sec-error-insufficient-access-rights` / `8344`) when attempting to stamp the `mS-DS-ConsistencyGuid` attribute onto target user objects during staging.
+### Soft-Delete vs. Scope Exclusion
+* **Account Disable (This Directory):** The object remains **in sync scope** (OU filters still apply). The identity exists in Entra ID, but its authentication state is globally locked (`accountEnabled: false`).
+* **Moving Out of Scope:** Moving a disabled account to an unsynced OU triggers a **Cloud Soft-Delete** (moving the object to *Deleted Users* in Entra ID for 30 days before hard-deletion).
 
-### Root Cause Analysis
-By default, standard object read/write delegation commands do not automatically grant write access to extended schema attributes like `mS-DS-ConsistencyGuid`. Because Entra Connect utilizes this attribute as the immutable source anchor binding the on-premises `ObjectGUID` to the cloud identity, missing write rights block the sync engine's export phase.
-
-### Resolution
-Applied property-specific write permissions directly to the target organizational unit (`OU=Synced_Users`) targeting descendant `user` objects via `dsacls`:
-
-```cmd
-dsacls "OU=Synced_Users,DC=lab,DC=local" /I:S /G "lab\svc-entra-sync":WP;mS-DS-ConsistencyGuid;user
+### Privileged Account Edge Case (AdminSDHolder)
+If an account being disabled is a member of protected AD groups (e.g., *Account Operators*, *Domain Admins*), ACL inheritance may be disabled via `AdminSDHolder`. Ensure sync engine service accounts retain `Read userAccountControl` rights across all target OUs to prevent stale active states in the cloud.

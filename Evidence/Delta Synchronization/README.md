@@ -20,7 +20,7 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 |---|---|---|---|
 | **1. Source Update** | `DC01` | [dc01-attribute-update](./dc01-attribute-update.txt) | Executed `Set-ADUser`; updated `Title` and `Department` attributes |
 | **2. Delta Engine Trigger** | `ENTRA-SYNC01` | [delta-sync-trigger](./delta-sync-trigger.jpg) | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; result: `Success` |
-| **3. Engine Execution** | `ENTRA-SYNC01` | `miisclient-delta-step.png` | `miisclient.exe` showing `Delta Import` and `Delta Sync` completed with `Updates: 1` |
+| **03** | **Delta Export Verification** | **`Evidence/Delta-Sync-Attribute-Export.jpg`** | **Captured `Connector Space Object Properties` during a Delta Export operation. Confirmed targeted attribute updates (`department`: `IT` $\rightarrow$ `Cybersecurity`, `title`: `Systems Administrator` $\rightarrow$ `Intelligence Analyst`) staged and pushed via verified `mS-DS-ConsistencyGuid` anchor.** |
 | **4. Cloud Reflection** | Entra ID Portal | `entra-audit-delta-update.png` | Status: `Success` (`Update user`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
 
 ---

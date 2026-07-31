@@ -1,0 +1,39 @@
+# Password Hash Synchronization (PHS) Validation
+
+## Executive Summary
+This directory contains end-to-end evidence validating Password Hash Synchronization (PHS) from on-premises Active Directory (`DC01`) to Microsoft Entra ID via Entra Connect (`ENTRA-SYNC01`).
+
+---
+
+## 1. Test Metadata
+* **Target Account:** `testuser2@davidbielascomcast.onmicrosoft.com`
+* **Service Principal:** `ConnectSyncProvisioning_ENTRA-SYNC01_e72762af8e46`
+* **Sync Server:** `ENTRA-SYNC01`
+* **Domain Controller:** `DC01`
+
+---
+
+## 2. Evidence Chain of Custody
+
+| Step | Source System | Evidence File / Artifact | Key Findings |
+|---|---|---|---|
+| **1. Local Reset** | `DC01` | `dc01-phs-reset.png` | `Set-ADAccountPassword` executed; `pwdLastSet` updated |
+| **2. Engine Harvest** | `ENTRA-SYNC01` | `sync-diagnostics.png` | `Invoke-ADSyncDiagnostics -DiagnosticName PasswordHashSync` returned `Success` |
+| **3. Processing** | `ENTRA-SYNC01` | `phs-operational-event.png` | Local batch extracted and hashed via HMAC-SHA256 |
+| **4. Cloud Ingestion** | Entra ID Portal | `entra-audit-log.png` | Status: `Success` (`Update PasswordProfile`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
+
+---
+
+## 3. Deep-Dive Analysis: Security & Pipeline Mechanics
+
+### Cryptographic Handling & Transport
+When an on-premises password change occurs on `DC01`, the raw password hash is extracted via DSGetNCChanges API (Directory Replication Services).
+* The MD4-based NT hash is re-hashed using **HMAC-SHA256** with a per-batch generated cryptographic key before leaving local memory.
+* High-frequency sync passes occur on a **2-minute background interval**, operating independently of standard 30-minute delta attribute sync cycles.
+* Transmitted securely over outbound **TLS 1.2 / HTTPS (Port 443)** directly to the Microsoft Entra identity endpoint.
+
+### Role & Identity Context (`ConnectSyncProvisioning`)
+Unlike manual administrative password resets or end-user cloud SSPR operations, inbound PHS writes do not generate interactive user logs.
+* Changes are processed automatically under the service principal identity: **`ConnectSyncProvisioning_ENTRA-SYNC01_*`**.
+* In the Entra Audit Logs, the event registers under **Service:** `Core Directory` with **Activity:** `Update PasswordProfile`.
+* Validates that background credential synchronization operates seamlessly without requiring administrative delegation or manual password resets in the cloud portal.

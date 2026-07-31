@@ -49,7 +49,7 @@ During initial deployment, using a pre-provisioned custom AD Connector service a
 By default, standard object read/write delegation commands do not automatically grant write access to extended schema attributes like `mS-DS-ConsistencyGuid`. Because Entra Connect utilizes this attribute as the immutable source anchor binding the on-premises `ObjectGUID` to the cloud identity, missing write rights block the sync engine's export phase.
 
 ### Resolution
-Applied property-specific write permissions directly to the target organizational unit (`OU=Synced_Users`) targeting descendant `user` objects:
+Applied property-specific write permissions directly to the target organizational unit (`OU=Users`) targeting descendant `user` objects:
 
 ```cmd
 dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entra-sync":WP;mS-DS-ConsistencyGuid;user

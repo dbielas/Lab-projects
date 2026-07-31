@@ -10,7 +10,7 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 * **Service Principal:** `ConnectSyncProvisioning_ENTRA-SYNC01_e72762af8e46`
 * **Sync Server:** `ENTRA-SYNC01`
 * **Domain Controller:** `DC01`
-* **Modified Attributes:** `Title` ("Senior Systems Administrator"), `Department` ("Information Technology")
+* **Modified Attributes:** `Title` ("Intelligence Analyst"), `Department` ("Cybersecurity")
 
 ---
 
@@ -20,7 +20,7 @@ This directory contains end-to-end evidence validating standard Delta Synchroniz
 |---|---|---|---|
 | **1. Source Update** | `DC01` | [dc01-attribute-update](./dc01-attribute-update.txt) | Executed `Set-ADUser`; updated `Title` and `Department` attributes |
 | **2. Delta Engine Trigger** | `ENTRA-SYNC01` | [delta-sync-trigger](./delta-sync-trigger.jpg) | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; result: `Success` |
-| **03 Delta Export Verification** | `ENTRA-SYNC01` | **[Delta-Sync-Attribute-Export](./Delta-Sync-Attribute-Export.jpg)** | **Captured `Connector Space Object Properties` during a Delta Export operation. Confirmed targeted attribute updates (`department`: `IT` $\rightarrow$ `Cybersecurity`, `title`: `Systems Administrator` $\rightarrow$ `Intelligence Analyst`) staged and pushed via verified `mS-DS-ConsistencyGuid` anchor.** |
+| **3. Delta Export Verification** | `ENTRA-SYNC01` | **[Delta-Sync-Attribute-Export](./Delta-Sync-Attribute-Export.jpg)** | **Captured `Connector Space Object Properties` during a Delta Export operation. Confirmed targeted attribute updates (`department`: `IT` $\rightarrow$ `Cybersecurity`, `title`: `Systems Administrator` $\rightarrow$ `Intelligence Analyst`) staged and pushed via verified `mS-DS-ConsistencyGuid` anchor.** |
 | **4. Cloud Reflection** | Entra ID Portal | [entra-audit-delta-update](./entra-audit-delta-update.jpg) | Status: `Success` (`Update user`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
 
 ---
@@ -37,3 +37,19 @@ When a Delta Sync cycle runs, Entra Connect queries local AD domain controllers 
 During delta evaluations, attributes are validated against the active schema filters configured during Entra Connect setup.
 * **Direct Schema Mapping:** Standard organizational fields (`Title` $\rightarrow$ `jobTitle`, `Department` $\rightarrow$ `department`) sync out-of-the-box without custom sync rule overrides.
 * **Audit Trail Differential:** Unlike credential operations (`Update PasswordProfile`), general metadata updates write to Entra Audit logs with **Activity:** `Update user` under **Service:** `Core Directory`, populating modified property lists with both old and new string values.
+
+---
+
+## 4. Engineering Notes: Custom Service Account Remediation
+
+### Problem Statement (Error 8344)
+During initial deployment, using a pre-provisioned custom AD Connector service account resulted in export failures (`sec-error-insufficient-access-rights` / `8344`) when attempting to stamp the `mS-DS-ConsistencyGuid` attribute onto target user objects during staging.
+
+### Root Cause Analysis
+By default, standard object read/write delegation commands do not automatically grant write access to extended schema attributes like `mS-DS-ConsistencyGuid`. Because Entra Connect utilizes this attribute as the immutable source anchor binding the on-premises `ObjectGUID` to the cloud identity, missing write rights block the sync engine's export phase.
+
+### Resolution
+Applied property-specific write permissions directly to the target organizational unit (`OU=Synced_Users`) targeting descendant `user` objects:
+
+```cmd
+dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entra-sync":WP;mS-DS-ConsistencyGuid;user

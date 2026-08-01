@@ -35,5 +35,7 @@ graph TD
 ```
 
 ---
-
+* [Module 01: Self-Service Password Reset (SSPR) & Password Writeback Validation](./Evidence/01-Self%20Service%20Password%20Reset)
 * [Module 05: Account Disable & Identity Deprovisioning Lifecycle](./Evidence/05-Account-Deprovisioning)
+* [Module 05: Account Disable & Identity Deprovisioning Lifecycle](./Evidence/05-Account-Deprovisioning)
+* [Module 04: Account Disable & Identity Deprovisioning Lifecycle](./Evidence/04-Account-Deprovisioning)

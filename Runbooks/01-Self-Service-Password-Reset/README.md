@@ -37,7 +37,7 @@
 
 ## 3. Account Delegation & On-Premises ACLs
 
-The Entra Connect custom service account (`lab\svc-entra-sync`) requires explicit delegated rights on all synced OUs containing user accounts.
+The Entra Connect custom service account (`hybrid.lan\svc-entrasync`) requires explicit delegated rights on all synced OUs containing user accounts.
 
 ### Required Active Directory Rights
 * **Reset Password**
@@ -47,7 +47,7 @@ The Entra Connect custom service account (`lab\svc-entra-sync`) requires explici
 ### ACL Verification & Remediation Command
 Run this command on `DC01` if permission errors occur during writeback:
 ```cmd
-dsacls "OU=Synced_Users,DC=lab,DC=local" /I:S /G "lab\svc-entra-sync":RPWP;pwdLastSet;user
+dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entrasync":RPWP;pwdLastSet;user
 ```
 
 ---
@@ -90,5 +90,5 @@ Get-ADSyncPasswordWritebackConfiguration
 
 ### On-Premises Security Log (`DC01`)
 * **Log:** `Security`
-* **Event ID 4724:** An attempt was made to reset an account's password (shows `TargetUserName` as target user and `Subject` as service account `lab\svc-entra-sync`).
+* **Event ID 4724:** An attempt was made to reset an account's password (shows `TargetUserName` as target user and `Subject` as service account `hybrid.lan\svc-entrasync`).
 * **Event ID 4723:** An attempt was made to change an account's password.

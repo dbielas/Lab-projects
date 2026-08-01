@@ -47,7 +47,7 @@ The Entra Connect custom service account (`hybrid.lan\svc-entrasync`) requires e
 ### ACL Verification & Remediation Command
 Run this command on `DC01` if permission errors occur during writeback:
 ```cmd
-dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entrasync":RPWP;pwdLastSet;user
+dsacls "OU=Users,OU=Synced_Objects,DC=hybrid,DC=lan" /I:S /G "hybrid.lan\svc-entrasync:RPWP;pwdLastSet;user"
 ```
 
 ---

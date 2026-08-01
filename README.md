@@ -36,4 +36,4 @@ graph TD
 
 ---
 
-* [Module 05: Account Disable & Identity Deprovisioning Lifecycle](./Evidence/05-Account-Deprovisioning/README.md)
+* [Module 05: Account Disable & Identity Deprovisioning Lifecycle](./Evidence/05-Account-Deprovisioning)

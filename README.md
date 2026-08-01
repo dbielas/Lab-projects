@@ -32,3 +32,8 @@ graph TD
     subgraph CloudIdentity [Microsoft Entra Cloud Boundary]
         ENTRA[Microsoft Entra ID Tenant]
     end
+```
+
+---
+
+* [Module 05: Account Disable & Identity Deprovisioning Lifecycle](./Docs/05-Account-Deprovisioning/README.md)

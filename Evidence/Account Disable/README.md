@@ -19,7 +19,7 @@ This directory contains end-to-end evidence validating on-premises account disab
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. On-Premises Disable** | `DC01` | [dc01-account-disable.txt](./dc01-account-disable.txt) | Executed `Disable-ADAccount`; updated `userAccountControl` bitmask to include `ACCOUNTDISABLE` (`514`). |
+| **01. On-Premises Disable** | `DC01` | [dc01-account-disable.txt](./dc01-account-disable) | Executed `Disable-ADAccount`; updated `userAccountControl` bitmask to include `ACCOUNTDISABLE` (`514`). |
 | **02. Delta Engine Execution** | `ENTRA-SYNC01` | [delta-sync-trigger](./delta-sync-trigger.jpg) | Triggered `Start-ADSyncSyncCycle -PolicyType Delta`; engine staged `userAccountControl` modifications in AD Connector Space. |
 | **03. Delta Export Staging** | `ENTRA-SYNC01` | [miisclient-export-disable](./miisclient-export-disable.jpg) | Verified `Connector Space Object Properties` during Delta Export. Confirmed `accountEnabled` attribute transform staged from `true` to `false`. |
 | **04. Entra ID Audit Log** | Entra ID Portal | [entra-audit-account-disable](./entra-audit-account-disable.jpg) | Verified `Disable account` / `Update user` event under Core Directory audit logs. Confirmed `accountEnabled: false` property diff. |

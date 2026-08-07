@@ -9,8 +9,8 @@ This repository documents the deployment, configuration, and hybrid management o
 
 | Hostname | Role | IP Address | Operating System | Managed Services |
 | :--- | :--- | :--- | :--- | :--- |
-| **DC01** | Primary Domain Controller (`hybrid.lan`), DNS Server | `192.168.10.10` | Windows Server 2022 | AD DS, DNS, Azure Arc Agent, AMA |
-| **ENTRA-SYNC01** | Domain Member Server, Identity Sync Engine | `192.168.10.11` | Windows Server 2022 | Entra Connect Sync, Azure Arc Agent, AMA |
+| **DC01** | Primary Domain Controller (`hybrid.lan`), DNS Server | `10.0.2.4` | Windows Server 2022 | AD DS, DNS, Azure Arc Agent, AMA |
+| **ENTRA-SYNC01** | Domain Member Server, Identity Sync Engine | `10.0.2.5` | Windows Server 2022 | Entra Connect Sync, Azure Arc Agent, AMA |
 
 ---
 

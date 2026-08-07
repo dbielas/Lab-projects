@@ -12,7 +12,7 @@ This directory contains end-to-end evidence validating the onboarding, telemetry
 * **Resource Group:** `rg-hybrid-arc`
 * **Data Collection Rule:** `dcr-windows-event-logs`
 * **Onboarding Method:** Service Principal (`sp-arc-onboarding`)
-* **Control Agent:** Azure Connected Machine Agent (`azcmagent` v1.40)
+* **Control Agent:** Azure Connected Machine Agent (`azcmagent` 1.66.03466.3076)
 * **Telemetry Extension:** Azure Monitor Windows Agent (`AzureMonitorWindowsAgent` v1.31)
 
 ---

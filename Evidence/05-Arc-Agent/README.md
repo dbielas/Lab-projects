@@ -21,7 +21,7 @@ This directory contains end-to-end evidence validating the onboarding, telemetry
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. Local Arc Agent Status** | `ENTRA-SYNC01` | `azcmagent-status-show.txt` | Executed `azcmagent.exe show`; confirmed `Agent Status: Connected` and core services (`himds`, `ExtensionService`) running. |
+| **01. Local Arc Agent Status** | `DC01, ENTRA-SYNC01` | [azcmagent-status-show](./azcmagent-status-show.txt) | Executed `azcmagent.exe show`; confirmed `Agent Status: Connected` and core services (`himds`, `ExtensionService`) running. |
 | **02. Extension Pipeline Check** | `ENTRA-SYNC01` | `azcmagent-extension-list.txt` | Executed `azcmagent.exe extension list`; verified `AzureMonitorWindowsAgent` extension in `Succeeded` provisioning state. |
 | **03. Heartbeat Ingestion Verification** | Log Analytics | `kql-heartbeat-telemetry.txt` | Executed `Heartbeat` KQL query; confirmed lockstep health signals, local IPs, and Arizona MST timestamps across `DC01` and `ENTRA-SYNC01`. |
 | **04. Security Audit Event Ingestion** | Log Analytics | `kql-security-events.txt` | Executed `Event` KQL query; verified real-time security event log ingestion originating from `DC01`. |

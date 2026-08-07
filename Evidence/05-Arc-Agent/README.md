@@ -6,8 +6,8 @@ This directory contains end-to-end evidence validating the onboarding, telemetry
 ---
 
 ## 1. Test Metadata
-* **Primary Infrastructure Node:** `DC01` (192.168.10.10) — Primary Domain Controller
-* **Sync Infrastructure Node:** `ENTRA-SYNC01` (192.168.10.11) — Entra Connect Sync Engine
+* **Primary Infrastructure Node:** `DC01` (10.0.2.4) — Primary Domain Controller
+* **Sync Infrastructure Node:** `ENTRA-SYNC01` (10.0.2.5) — Entra Connect Sync Engine
 * **Target Workspace:** `law-hybrid-logs`
 * **Resource Group:** `rg-hybrid-arc`
 * **Data Collection Rule:** `dcr-windows-event-logs`

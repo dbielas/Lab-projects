@@ -1,0 +1,4 @@
+Name          Status     OS       Region
+------------  ---------  -------  --------
+DC01          Connected  windows  westus2
+ENTRA-SYNC01  Connected  windows  westus2

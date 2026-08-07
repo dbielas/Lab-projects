@@ -1,0 +1,5 @@
+Extension: AzureMonitorWindowsAgent
+Version: 1.44.0.0
+Extension Path: C:\Packages\Plugins\Microsoft.Azure.Monitor.AzureMonitorWindowsAgent
+State: ENABLED
+

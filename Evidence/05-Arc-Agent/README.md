@@ -23,7 +23,7 @@ This directory contains end-to-end evidence validating the onboarding, telemetry
 |---|---|---|---|
 | **01. Local Arc Agent Status** | `DC01, ENTRA-SYNC01` | [azcmagent-status-show](./azcmagent-status-show.txt) | Executed `azcmagent.exe show`; confirmed `Agent Status: Connected` and core services (`himds`, `ExtensionService`) running. |
 | **02. Extension Pipeline Check** | `DC01, ENTRA-SYNC01` | [azcmagent-extension-list](./azcmagent-extension-list.txt) | Executed `azcmagent.exe extension list`; verified `AzureMonitorWindowsAgent` extension in `Succeeded` provisioning state. |
-| **03. Heartbeat Ingestion Verification** | Log Analytics | [arc-connected-machines](./arc-connected-machines.txt) | Executed `az connectedmachine list` query; confirmed both `DC01` and `ENTRA-SYNC01` connected to Azure. |
+| **03. Heartbeat Ingestion Verification** | `DC01` | [arc-connected-machines](./arc-connected-machines.txt) | Executed `az connectedmachine list` query; confirmed both `DC01` and `ENTRA-SYNC01` connected to Azure. |
 | **04. Heartbeat Ingestion Verification** | Log Analytics | [kql-heartbeat-telemetry](./kql-heartbeat-telemetry.csv) | Executed `Heartbeat` KQL query; confirmed lockstep health signals and Arizona MST timestamps across `DC01` and `ENTRA-SYNC01`. |
 
 ---

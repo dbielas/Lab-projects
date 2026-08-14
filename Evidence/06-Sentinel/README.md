@@ -10,8 +10,8 @@ This directory documents the deployment and validation of **Microsoft Sentinel**
 * **Log Analytics Workspace:** `law-hybrid-logs`
 * **Resource Group:** `rg-hybrid-arc`
 * **Monitored Hybrid Endpoints:**
-  * `DC01` (192.168.10.10) — Primary Domain Controller
-  * `ENTRA-SYNC01` (192.168.10.11) — Entra Connect Sync Server
+  * `DC01` (10.0.2.4) — Primary Domain Controller
+  * `ENTRA-SYNC01` (10.0.2.5) — Entra Connect Sync Server
 * **Data Connectors Active:**
   * Windows Security Events via AMA (`dcr-windows-event-logs`)
   * Microsoft Entra ID (AuditLogs, SignInLogs)

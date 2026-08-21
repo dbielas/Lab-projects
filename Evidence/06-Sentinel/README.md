@@ -26,7 +26,7 @@ This directory documents the deployment and validation of **Microsoft Sentinel**
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. Sentinel Workspace Onboarding** | Azure Portal / ARM | [sentinel-workspace-provisioning](`.\sentinel-workspace-provisioning.txt`) | Initialized Microsoft Sentinel on `law-hybrid-logs`; verified trial pricing tier and data ingestion endpoints. |
+| **01. Sentinel Workspace Onboarding** | Azure Portal / ARM | [sentinel-workspace-provisioning](.\sentinel-workspace-provisioning.txt) | Initialized Microsoft Sentinel on `law-hybrid-logs`; verified trial pricing tier and data ingestion endpoints. |
 | **02. Data Connector Validation** | Microsoft Sentinel | `sentinel-connector-ama-health.jpg` | Confirmed active data streaming from `AzureMonitorWindowsAgent` covering Windows Security Event channels. |
 | **03. Custom Analytics Rule Deploy** | Microsoft Sentinel | `sentinel-kql-rule-privilege-escalation.json` | Configured scheduled KQL detection rule triggering high-severity incidents on sensitive AD group modifications. |
 | **04. Simulated Attack Execution** | `DC01` | `simulated-priv-esc-execution.txt` | Generated synthetic security telemetry by adding a target user to the local `Domain Admins` group. |

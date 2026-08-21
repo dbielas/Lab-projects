@@ -1,0 +1,30 @@
+{
+  "createdDate": "2026-08-05T03:40:30.0267571Z",
+  "customerId": "00000000-0000-0000-0000-000000000000",
+  "etag": "\"sanitized-etag\"",
+  "features": {
+    "enableLogAccessUsingOnlyResourcePermissions": true,
+    "legacy": 0,
+    "searchVersion": 1,
+    "unifiedSentinelBillingOnly": true
+  },
+  "id": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-hybrid-arc/providers/Microsoft.OperationalInsights/workspaces/law-hybrid-logs",
+  "location": "westus2",
+  "modifiedDate": "2026-08-05T03:40:43.3803475Z",
+  "name": "law-hybrid-logs",
+  "provisioningState": "Succeeded",
+  "publicNetworkAccessForIngestion": "Enabled",
+  "publicNetworkAccessForQuery": "Enabled",
+  "resourceGroup": "rg-hybrid-arc",
+  "retentionInDays": 30,
+  "sku": {
+    "lastSkuUpdate": "2026-08-05T03:40:30.0267571Z",
+    "name": "PerGB2018"
+  },
+  "type": "Microsoft.OperationalInsights/workspaces",
+  "workspaceCapping": {
+    "dailyQuotaGb": -1.0,
+    "dataIngestionStatus": "RespectQuota",
+    "quotaNextResetTime": "2026-08-05T08:00:00Z"
+  }
+}

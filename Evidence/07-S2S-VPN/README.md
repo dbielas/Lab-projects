@@ -31,7 +31,7 @@ graph TD
 | :--- | :--- | :--- |
 | **DC01** | Primary Domain Controller & DNS | `10.0.2.4` |
 | **ENTRA-SYNC01** | Microsoft Entra Connect Sync Server | `10.0.2.5` |
-| **vng-hybrid-core** | Virtual Network Gateway | `pip-vng-hybrid` / `GatewaySubnet` |
+| **vng-hybrid-core** | Virtual Network Gateway | `pip-vng-hybrid` / `GatewaySubnet` `10.1.255.0/27` |
 | **vm-test** | Domain-Joined Workload (Linux) | `10.1.1.4` |
 
 ## 2. Validation Artifacts

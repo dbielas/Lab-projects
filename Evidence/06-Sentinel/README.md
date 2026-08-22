@@ -1,66 +1,68 @@
-# Microsoft Sentinel SIEM/SOAR Deployment & Hybrid Threat Detection Validation
+# Azure Hybrid Active Directory Infrastructure Lab
 
-## Executive Summary
-This directory documents the deployment and validation of **Microsoft Sentinel** layered over an existing hybrid Log Analytics Workspace (`law-hybrid-logs`). It outlines the end-to-end telemetry pipeline capturing on-premises domain security events from `DC01` and `ENTRA-SYNC01` via Azure Arc and Azure Monitor Agent (AMA), the implementation of custom KQL analytics detection rules, and automated incident triage workflows.
+## Overview
+This repository contains the architecture and validation evidence for a hybrid Active Directory environment. The infrastructure bridges an on-premises network with an Azure Virtual Network (VNet) via a Site-to-Site (S2S) IPsec VPN tunnel. This enables secure cross-premises DNS resolution, domain-joined workloads, and identity synchronization via Microsoft Entra Connect.
 
----
+## 1. Architecture & Topology
 
-## 1. Test Metadata
-* **SIEM Solution:** Microsoft Sentinel
-* **Log Analytics Workspace:** `law-hybrid-logs`
-* **Resource Group:** `rg-hybrid-arc`
-* **Monitored Hybrid Endpoints:**
-  * `DC01` (10.0.2.4) — Primary Domain Controller
-  * `ENTRA-SYNC01` (10.0.2.5) — Entra Connect Sync Server
-* **Data Connectors Active:**
-  * Windows Security Events via AMA (`dcr-windows-event-logs`)
-  * Microsoft Entra ID (AuditLogs, SignInLogs)
-* **Target Detection Scenarios:**
-  * On-Premises Privilege Escalation & Domain Admin Addition (Event ID `4728`)
-  * Brute Force Authentication Anomalies & Account Lockouts (Event ID `4625`, `4740`)
-  * Identity Sync Engine Tampering / Unauthorized Service Account Behavior
+### Network Diagram
+```mermaid
+graph TD
+    subgraph "On-Premises Network"
+        DC01[DC01<br>AD DS / DNS<br>10.0.2.4]
+        SYNC[ENTRA-SYNC01<br>Entra Connect<br>10.0.2.5]
+        CPE[(On-Prem VPN Gateway)]
+    end
 
----
+    subgraph "Azure Cloud (vnet-hybrid-core)"
+        VNG[vng-hybrid-core<br>Virtual Network Gateway<br>PIP: pip-vng-hybrid]
+        VM[vm-test<br>Linux Workload<br>10.1.1.4]
+    end
+
+    DC01 -.- CPE
+    SYNC -.- CPE
+    VNG -.- VM
+
+    CPE <-->|IPsec S2S Tunnel| VNG
+```
+
+### IP Address Management (IPAM)
+| Hostname | Role | IP Address |
+| :--- | :--- | :--- |
+| **DC01** | Primary Domain Controller & DNS | `10.0.2.4` |
+| **ENTRA-SYNC01** | Microsoft Entra Connect Sync Server | `10.0.2.5` |
+| **vng-hybrid-core** | Virtual Network Gateway | `pip-vng-hybrid` / `GatewaySubnet` `10.1.255.0/27` |
+| **vm-test** | Domain-Joined Workload (Linux) | `10.1.1.4` |
 
 ## 2. Evidence Chain of Custody
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. Sentinel Workspace Onboarding** | Azure Portal / ARM | [sentinel-workspace-provisioning](./sentinel-workspace-provisioning.txt) | Initialized Microsoft Sentinel on `law-hybrid-logs`; verified trial pricing tier and data ingestion endpoints. |
-| **02. Data Connector Validation** | Microsoft Sentinel | [sentinel-connector-ama-health](./sentinel-connector-ama-health.jpg) | Confirmed active data streaming from `AzureMonitorWindowsAgent` covering Windows Security Event channels. |
-| **03. Custom Analytics Rule Deploy** | Microsoft Sentinel | [sentinel-kql-rule-privilege-escalation](./sentinel-kql-rule-privilege-escalation.json) | Configured scheduled KQL detection rule triggering high-severity incidents on sensitive AD group modifications. |
-| **04. Simulated Attack Execution** | `DC01` | [simulated-priv-esc-execution-group-membership](./simulated-priv-esc-execution-group-membership.txt) / [add-event](./simulated-priv-esc-execution-add-event.txt) | Generated synthetic security telemetry by adding a target user to the local `Domain Admins` group. |
-| **05. Incident Generation & Triage** | Microsoft Sentinel | [sentinel-incident-triage-evidence](./sentinel-incident-triage-evidence.jpg) | Verified automated generation of Incident; mapped MITRE ATT&CK tactics (Credential access, Persistence, Privilege Escalation) and entity extraction. |
+| **01. S2S Tunnel Establishment** | Azure Portal | [vpn-gateway-status](./vpn-gateway-status.png) | Confirmed S2S tunnel connectivity and bi-directional data flow between on-premises and Azure. |
+| **02. Layer 3 Routing Validation** | `DC01` | [tracert-to-azure-vm](./tracert-to-azure-vm.txt) | Validated Layer 3 routing across the IPsec tunnel from the on-premises network to the Azure VNet. |
+| **03. Remote Access Verification** | Local Workstation | [ssh-session-vm-test](./ssh-session-vm-test.png) | Verified remote administrative access to `vm-test` via SSH over the private IPsec tunnel. |
+| **04. Cross-Premises DNS Resolution** | `vm-test` | [dig-hybrid-lan](./dig-hybrid-lan.txt) | Confirmed Azure workload resolution of the local Active Directory domain (`hybrid.lan`) via `DC01`. |
+| **05. AD Port Reachability** | `vm-test` | [nc-ad-ports-check](./nc-ad-ports-check.txt) | Proved Network Security Group (NSG) allowances for Active Directory LDAP and Kerberos traffic. |
+| **06. Hybrid Domain Integration** | `DC01` (ADUC) | [aduc-vm-test-object](./aduc-vm-test-object.png) | Demonstrated successful hybrid domain join of the Linux workload into the local Active Directory. |
+| **07. Entra ID Synchronization** | `ENTRA-SYNC01` | [entra-sync-export-log](./entra-sync-export-log.csv) | Verified successful identity and object synchronization to the Azure AD / Entra ID tenant. |
+
+## 3. Tunnel Health & Layer 3 Routing
+*   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*
+*   **Trace Routing:** *(Insert text/screenshot: Output of `tracert 10.1.1.4` from `DC01` showing ICMP packets correctly routing through the on-premises gateway and across the IPsec tunnel)*
+*   **SSH Validation:** *(Insert screenshot: Terminal successfully SSH'd into the Linux VM `10.1.1.4` from the local network)*
+
+## 4. Name Resolution & Core Services
+Hybrid AD relies entirely on flawless DNS. This validates that the Azure VNet can communicate with the domain controller:
+
+*   **Cross-Premises DNS:** *(Insert text/screenshot: Output of `dig @10.0.2.4 hybrid.lan +short` from the Linux VM)*
+*   **Port Validation:** *(Insert text: Output of `nc -zv 10.0.2.4 389` (LDAP) and `nc -zv 10.0.2.4 88` (Kerberos) from the Linux VM proving NSGs and firewalls allow AD traffic)*
+
+## 5. Domain Integration
+This serves as the ultimate proof of the hybrid connection working:
+
+*   **Active Directory Computer Object:** *(Insert screenshot: Active Directory Users and Computers (ADUC) on `DC01` showing the `vm-test` computer object populated in the correct Organizational Unit)*
+*   **Entra Connect Sync:** *(Insert CSV/screenshot: Synchronization Service Manager on `ENTRA-SYNC01` showing a successful "Export" operation to Azure AD)*
 
 ---
-
-## 3. Deep-Dive Analysis: Sentinel Detection & Analytics Engineering
-
-### Ingestion Flow & Table Mapping
-* On-premises audit policies forward Windows Event Logs to the local SQLite staging cache via `MonAgentCore.exe`.
-* Telemetry streams outbound over HTTPS (TCP 443) into the `SecurityEvent` / `Event` tables in `law-hybrid-logs`.
-* Sentinel’s analytics engine continuously evaluates scheduled queries against incoming log streams.
-
-### KQL Analytics Detection Rule: Sensitive AD Group Addition
-```kusto
-SecurityEvent
-| where EventID in (4728, 4732, 4756) // A member was added to a security-enabled group
-| where TargetUserName in ("Domain Admins", "Enterprise Admins", "Schema Admins", "Account Operators")
-| extend LocalTime_MST = datetime_utc_to_local(TimeGenerated, 'US/Arizona')
-| project LocalTime_MST, Computer, SubjectUserName, SubjectDomainName, TargetUserName, MemberName, EventID
-| sort by LocalTime_MST desc
-```
-
-### Entity Mapping Architecture
-To enable automated triage and graph investigation, Sentinel maps query results directly to ARM entity identifiers:
-* **Account Entity:** `SubjectUserName` (Actor), `MemberName` (Target Object)
-* **Host Entity:** `Computer` (NetBIOS / FQDN)
-* **IP Entity:** `IpAddress` (Originating Client IP)
-
----
-
-## 4. Operational Considerations & Alert Tuning
-
-### Alert Suppression & False-Positive Handling
-* **Authorized Administrative Windows:** Built-in scheduled tasks or deployment accounts (e.g., `sp-arc-onboarding` or Entra Connect setup scripts) can trigger threshold alerts. Whitelisting specific service principals prevents incident fatigue.
-* **Query Frequency vs. Lookup Period:** Detection runs on a 5-minute schedule evaluating the previous 5 minutes of data (`Query Frequency: 5m`, `Query Period: 5m`) with zero threshold to ensure near-real-time alerting on critical security events.
+**Troubleshooting Notes:** 
+*   **Bastion Bypass:** During initial configuration, the Azure Bastion Developer SKU experienced a regional DNS resolution failure (`NODATA` response from Traffic Manager). Management operations were successfully rerouted through the Site-to-Site VPN as an out-of-band management fallback.

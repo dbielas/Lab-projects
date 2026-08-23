@@ -34,18 +34,17 @@ graph TD
 | **vng-hybrid-core** | Virtual Network Gateway | `pip-vng-hybrid` / `GatewaySubnet` `10.1.255.0/27` |
 | **vm-test** | Domain-Joined Workload (Linux) | `10.1.1.4` |
 
-## 2. Validation Artifacts
-Below is the master index of evidence collected to validate functionality across the physical, network, and application layers.
+## 2. Evidence Chain of Custody
 
-| Evidence Type | Artifact Format | Component Validated |
-| :--- | :--- | :--- |
-| VPN Gateway Status | Screenshot (`.png`) | S2S tunnel connectivity and bi-directional data flow. |
-| Trace Routing (`tracert`) | Text (`.txt`) / Screenshot | Layer 3 routing across the IPsec tunnel from on-prem to Azure. |
-| SSH Session | Screenshot (`.png`) | Remote administrative access to `vm-test` over the private tunnel. |
-| Cross-Premises DNS (`dig`) | Text (`.txt`) | Azure workload resolution of the local Active Directory domain. |
-| AD Port Validation (`nc`) | Text (`.txt`) | Network Security Group (NSG) allowances for LDAP/Kerberos. |
-| ADUC Computer Object | Screenshot (`.png`) | Successful hybrid domain join of the Linux workload. |
-| Entra Sync Export Log | CSV (`.csv`) / Screenshot | Successful identity synchronization to the cloud tenant. |
+| Step | Source System | Evidence File / Artifact | Key Findings |
+|---|---|---|---|
+| **01. S2S Tunnel Establishment** | Azure Portal | [vpn-gateway-status](./vpn-gateway-status.png) | Confirmed S2S tunnel connectivity and bi-directional data flow between on-premises and Azure. |
+| **02. Layer 3 Routing Validation** | `DC01` | [tracert-to-azure-vm](./tracert-to-azure-vm.txt) | Validated Layer 3 routing across the IPsec tunnel from the on-premises network to the Azure VNet. |
+| **03. Remote Access Verification** | Local Workstation | [ssh-session-vm-test](./ssh-session-vm-test.png) | Verified remote administrative access to `vm-test` via SSH over the private IPsec tunnel. |
+| **04. Cross-Premises DNS Resolution** | `vm-test` | [dig-hybrid-lan](./dig-hybrid-lan.txt) | Confirmed Azure workload resolution of the local Active Directory domain (`hybrid.lan`) via `DC01`. |
+| **05. AD Port Reachability** | `vm-test` | [nc-ad-ports-check](./nc-ad-ports-check.txt) | Proved Network Security Group (NSG) allowances for Active Directory LDAP and Kerberos traffic. |
+| **06. Hybrid Domain Integration** | `DC01` (ADUC) | [aduc-vm-test-object](./aduc-vm-test-object.png) | Demonstrated successful hybrid domain join of the Linux workload into the local Active Directory. |
+| **07. Entra ID Synchronization** | `ENTRA-SYNC01` | [entra-sync-export-log](./entra-sync-export-log.csv) | Verified successful identity and object synchronization to the Azure AD / Entra ID tenant. |
 
 ## 3. Tunnel Health & Layer 3 Routing
 *   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*

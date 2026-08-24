@@ -8,7 +8,7 @@ This directory contains end-to-end evidence validating the enforcement of a cust
 ## 1. Test Metadata
 * **Tenant:** `davidbielascomcast.onmicrosoft.com`
 * **Target Security Group:** `SecOps-Audit-Admins`
-* **Test Subject Account:** `admin-test01@davidbielascomcast.onmicrosoft.com`
+* **Test Subject Account:** `admin-test02@davidbielascomcast.onmicrosoft.com`
 * **Policy Name:** `CA-Require-MFA-Azure-Management`
 * **Target Resource:** `Microsoft Admin Portals` (App Group / Azure Management APIs)
 * **Access Control:** `Require authentication strength`

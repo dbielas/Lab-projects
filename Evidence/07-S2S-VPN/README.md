@@ -45,7 +45,7 @@ graph TD
 | **05. AD Port Reachability** | `vm-test` | [nc-ad-ports-check](./nc-ad-ports-check.jpg) | Proved Network Security Group (NSG) allowances for Active Directory LDAP and Kerberos traffic. |
 | **06. Hybrid Domain Integration** | `DC01` (ADUC) / `vm-test` | [aduc-vm-test-object](./aduc-vm-test-object.jpg) / [aduc-vm-test-object](./aduc-vm-test-object1.jpg) | Demonstrated successful hybrid domain join of the Linux workload into the local Active Directory. |
 | **07. Identity Sync & Filtering** | `ENTRA-SYNC01` | [ssm-export](./SSM-EXPORT.JPG) | Verified object ingestion into the Active Directory Connector Space and demonstrated default Entra Connect OS filtering rules for non-native workloads. |
-| **08. Hybrid Device Registration** | Azure Portal | [entra-hybrid-join-status.png](./entra-hybrid-join-status.png) | Verified successful Hybrid Microsoft Entra join and synchronization of a standard Windows production workload to the cloud tenant. |
+| **08. Hybrid Device Registration** | Azure Portal / `ENTRA-SYNC01`| [entra-hybrid-join-status.png](./entra-hybrid-join-status.png) / [entra-import-sync](./winvm-sync-import.jpg) | Verified successful Hybrid Microsoft Entra join and synchronization of a standard Windows production workload to the cloud tenant. |
 
 ## 3. Tunnel Health & Layer 3 Routing
 *   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*

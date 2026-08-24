@@ -48,11 +48,14 @@ The emergency access account was explicitly excluded from the Conditional Access
 
 ### Visual Evidence
 
-#### Conditional Access Policy Configuration
-![CA_Policy_Config](./CA_Policy_Config.jpg)
+#### 1. Dual-Plane RBAC Provisioning
+![rbac-group-assignment](./rbac-group-assignment.jpg)
 
-#### Sign-In Telemetry (Report-Only Evaluation)
-![ca-sign-in-telemetry](./ca-sign-in-telemetry.jpg)
+#### 2. What If Simulation (Policy Applies)
+![what-if-target-match](./CA-Require-MFA-Azure-Management.jpg)
 
-#### What If Policy Simulation & Break-Glass Exclusion
-![what-if-exclusion-proof](./what-if-exclusion-proof.jpg)
+#### 3. Break-Glass Exclusion Proof
+![what-if-exclusion-proof](./CA-Require-MFA-Azure-Management-exclusion.jpg)
+
+#### 4. Sign-In Telemetry (Report-Only Evaluation)
+![ca-sign-in-telemetry](./Sign-In-Logs-CA.jpg)

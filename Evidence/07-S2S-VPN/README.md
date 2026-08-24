@@ -47,7 +47,6 @@ graph TD
 | **07. Identity Sync & Filtering** | `ENTRA-SYNC01` | [SSM-EXPORT.JPG](./SSM-EXPORT.JPG) | Verified object ingestion into the Active Directory Connector Space and demonstrated default Entra Connect OS filtering rules for non-native workloads. |
 | **08. Hybrid Device Registration** | Azure Portal | [entra-hybrid-join-status.png](./entra-hybrid-join-status.png) | Verified successful Hybrid Microsoft Entra join and synchronization of a standard Windows production workload to the cloud tenant. |
 
-
 ## 3. Tunnel Health & Layer 3 Routing
 *   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*
 *   **Trace Routing:** *(Insert text/screenshot: Output of `tracert 10.1.1.4` from `DC01` showing ICMP packets correctly routing through the on-premises gateway and across the IPsec tunnel)*

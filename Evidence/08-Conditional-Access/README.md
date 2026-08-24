@@ -23,7 +23,7 @@ This directory contains end-to-end evidence validating the enforcement of a cust
 | **1. Role Provisioning** | Microsoft Graph / ARM | [rbac-group-assignment](./rbac-group-assignment.jpg) | Group assigned `Global Reader` (Directory) & `Reader` (Subscription Scope). |
 | **2. Policy Simulation** | Entra What If Tool | [what-if-target-match](./CA-Require-MFA-Azure-Management.jpg) | Policy evaluated under `Policies that will apply` for `admin-test02`. |
 | **3. Safety Net Check** | Entra What If Tool | [what-if-exclusion-proof](./CA-Require-MFA-Azure-Management-exclusion.jpg) | Policy evaluated under `Policies that will not apply` for Break-Glass Admin. |
-| **4. Telemetry Capture** | Entra Sign-in Logs | [ca-sign-in-telemetry.jpg](./ca-sign-in-telemetry.jpg) | Result: `Report-only: User action required` (`Grant Controls: Not satisfied`). |
+| **4. Telemetry Capture** | Entra Sign-in Logs | [ca-sign-in-telemetry](./Sign-In-Logs-CA.jpg) | Result: `Report-only: User action required` (`Grant Controls: Not satisfied`). |
 
 ---
 
@@ -35,7 +35,7 @@ During initial resource-plane delegation via PowerShell, a `Microsoft.Authorizat
 * **Remediation:** Executed administrative delegation via an existing Subscription `Owner` security principal to grant `Reader` scope to `SecOps-Audit-Admins`, followed by an explicit token cache flush (`Connect-AzAccount -Force` / Cloud Shell restart) to mint updated role claims.
 
 ### Telemetry Analysis: Report-Only "Not Satisfied" Grant Controls
-Live sign-in testing with `admin-test01` generated a `Report-only: User action required` audit log with Grant Controls flagged as **Not satisfied**:
+Live sign-in testing with `admin-test02` generated a `Report-only: User action required` audit log with Grant Controls flagged as **Not satisfied**:
 * **Technical Note:** In `Report-only` mode, the Conditional Access engine acts passively without enforcing step-up authentication prompts. 
 * **Validation:** Because the incoming authentication token lacked the high-tier Authentication Strength claims mandated by the policy, the engine correctly identified a non-compliant sign-in without breaking user workflow—proving detection efficacy prior to production enforcement.
 

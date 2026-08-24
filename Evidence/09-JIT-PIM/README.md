@@ -19,8 +19,8 @@ This directory contains evidence validating the enforcement of Zero Trust princi
 | Step | Phase | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
 | **1. Zero Trust Baseline** | Entra ID Groups | *Configuration* | `Admin Test 02` stripped of active membership; transitioned to `Eligible` state only. |
-| **2. Request Initiation** | PIM Portal | [Request-Approval.jpg](./Request-Approval.jpg) | User requested activation linking mock ticket `CHG-9942` with justification. |
-| **3. Manual Approval** | PIM Portal | [Request-Approval.jpg](./Request-Approval.jpg) | Global Admin evaluated and approved the request for the specified ticket execution. |
+| **2. Request Initiation** | PIM Portal | [Request-Approval](./pim-activate-request.jpg) | User requested activation linking mock ticket `CHG-9942` with justification. |
+| **3. Manual Approval** | PIM Portal | [Request-Approval.jpg](./pim-active-timebound.jpg) | Global Admin evaluated and approved the request for the specified ticket execution. |
 | **4. Time-Bound Execution** | PIM Portal | [active-assignment.jpg](./active-assignment.jpg) | Access granted with a hard cryptographic expiration timestamp exactly two hours from activation. |
 
 ---

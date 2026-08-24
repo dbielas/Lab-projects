@@ -22,7 +22,7 @@ This directory contains end-to-end evidence validating the enforcement of a cust
 |---|---|---|---|
 | **1. Role Provisioning** | Microsoft Graph / ARM | [rbac-group-assignment](./rbac-group-assignment.jpg) | Group assigned `Global Reader` (Directory) & `Reader` (Subscription Scope). |
 | **2. Policy Simulation** | Entra What If Tool | [what-if-target-match](./CA-Require-MFA-Azure-Management.jpg) | Policy evaluated under `Policies that will apply` for `admin-test01`. |
-| **3. Safety Net Check** | Entra What If Tool | [what-if-exclusion-proof.jpg](./what-if-exclusion-proof.jpg) | Policy evaluated under `Policies that will not apply` for Break-Glass Admin. |
+| **3. Safety Net Check** | Entra What If Tool | [what-if-exclusion-proof](./CA-Require-MFA-Azure-Management-exclusion.jpg) | Policy evaluated under `Policies that will not apply` for Break-Glass Admin. |
 | **4. Telemetry Capture** | Entra Sign-in Logs | [ca-sign-in-telemetry.jpg](./ca-sign-in-telemetry.jpg) | Result: `Report-only: User action required` (`Grant Controls: Not satisfied`). |
 
 ---

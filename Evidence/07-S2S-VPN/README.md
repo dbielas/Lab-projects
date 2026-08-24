@@ -44,7 +44,9 @@ graph TD
 | **04. Cross-Premises DNS Resolution** | `vm-test` | [dig-hybrid-lan](./dig-hybrid-lan.txt) | Confirmed Azure workload resolution of the local Active Directory domain (`hybrid.lan`) via `DC01`. |
 | **05. AD Port Reachability** | `vm-test` | [nc-ad-ports-check](./nc-ad-ports-check.txt) | Proved Network Security Group (NSG) allowances for Active Directory LDAP and Kerberos traffic. |
 | **06. Hybrid Domain Integration** | `DC01` (ADUC) | [aduc-vm-test-object](./aduc-vm-test-object.png) | Demonstrated successful hybrid domain join of the Linux workload into the local Active Directory. |
-| **07. Entra ID Synchronization** | `ENTRA-SYNC01` | [entra-sync-export-log](./entra-sync-export-log.csv) | Verified successful identity and object synchronization to the Azure AD / Entra ID tenant. |
+| **07. Identity Sync & Filtering** | `ENTRA-SYNC01` | [SSM-EXPORT.JPG](./SSM-EXPORT.JPG) | Verified object ingestion into the Active Directory Connector Space and demonstrated default Entra Connect OS filtering rules for non-native workloads. |
+| **08. Hybrid Device Registration** | Azure Portal | [entra-hybrid-join-status.png](./entra-hybrid-join-status.png) | Verified successful Hybrid Microsoft Entra join and synchronization of a standard Windows production workload to the cloud tenant. |
+
 
 ## 3. Tunnel Health & Layer 3 Routing
 *   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*

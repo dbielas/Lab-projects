@@ -46,11 +46,6 @@ The emergency access account was explicitly excluded from the Conditional Access
 
 ---
 
-## 4. Artifacts
-
-* 📄 **PowerShell Provisioning Log:** [`rbac-group-assignment.txt`](./rbac-group-assignment.txt)
-* 📄 **Entra Sign-in Event Details:** [`ca-signin-report.csv`](./ca-signin-report.csv)
-
 ### Visual Evidence
 
 #### Conditional Access Policy Configuration

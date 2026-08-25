@@ -18,10 +18,10 @@ This directory contains evidence validating the enforcement of Zero Trust princi
 
 | Step | Phase | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Zero Trust Baseline** | Entra ID Groups | *Configuration* | `Admin Test 02` stripped of active membership; transitioned to `Eligible` state only. |
-| **2. Request Initiation** | PIM Portal | [acitvate-request](./pim-activate-request.jpg) | User requested activation linking mock ticket `CHG-9942` with justification. |
-| **3. Manual Approval** | PIM Portal | [request-approval](./pim-approval-request.jpg) | Global Admin evaluated and approved the request for the specified ticket execution. |
-| **4. Time-Bound Execution** | PIM Portal | [active-assignment](./pim-active-timebound.jpg) | Access granted with a hard cryptographic expiration timestamp exactly two hours from activation. |
+| **1. Request Initiation** | PIM Portal | [acitvate-request](./pim-activate-request.jpg) | User requested activation linking mock ticket `CHG-9942` with justification. |
+| **2. Manual Approval** | PIM Portal | [request-approval](./pim-approval-request.jpg) | Global Admin evaluated and approved the request for the specified ticket execution. |
+| **3. Time-Bound Execution** | PIM Portal | [active-assignment](./pim-active-timebound.jpg) | Access granted with a hard cryptographic expiration timestamp exactly two hours from activation. |
+| **4. Automated Revocation** | Entra Audit Logs | [pim-auto-revoke.jpg](./pim-auto-revoke.jpg) | System automatically stripped group membership precisely at the two-hour expiration mark. |
 
 ---
 

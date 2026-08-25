@@ -42,7 +42,7 @@ Rather than managing distinct PIM eligibilities for the Entra ID Directory Role 
 ### Visual Evidence
 
 #### 1. JIT Request & Approval Workflow
-![Request Approval](./Request-Approval.jpg)
+![Request Approval](./pim-approval-request.jpg)
 
 #### 2. Time-Bound Active Assignment
-![Active Assignment](./active-assignment.jpg)
+![Active Assignment](./pim-active-timebound.jp)

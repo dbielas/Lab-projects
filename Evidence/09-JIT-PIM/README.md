@@ -45,4 +45,4 @@ Rather than managing distinct PIM eligibilities for the Entra ID Directory Role 
 ![Request Approval](./pim-approval-request.jpg)
 
 #### 2. Time-Bound Active Assignment
-![Active Assignment](./pim-active-timebound.jp)
+![Active Assignment](./pim-active-timebound.jpg)

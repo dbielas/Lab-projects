@@ -46,3 +46,6 @@ Rather than managing distinct PIM eligibilities for the Entra ID Directory Role 
 
 #### 2. Time-Bound Active Assignment
 ![Active Assignment](./pim-active-timebound.jpg)
+
+#### 3. Automated Zero Trust Revocation
+![Automated Revocation](./pim-auto-revoke.jpg)

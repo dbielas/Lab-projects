@@ -70,19 +70,19 @@ To enable communication between the on-premises virtual environment and Azure sp
 * **Gateway Subnet UDR:** A custom route table applied to `GatewaySubnet` forces all ingress cross-premises traffic destined for Spoke 2 (`10.2.0.0/16`) directly to the Azure Firewall (`10.3.1.4`) before reaching workload subnets.
 * **Return Path Integrity:** Spoke subnets utilize a UDR routing `10.0.2.0/24` to the Azure Firewall private IP, ensuring both ingress and egress passes traverse the stateful engine symmetrically.
 
-### Stateful Identity Traffic Inspection (`RC-Active-Directory-Sync`)
+### Stateful Identity Traffic Inspection ([spoke2-nc-validation](./spoke2-nc-validation.jpg))
 Instead of allowing uninspected network traversal, domain services are explicitly filtered and governed through stateful network rules:
 * **Directory Services:** TCP/UDP `389` (LDAP), `636` (LDAPS), and `135` (RPC Endpoint Mapper).
 * **Authentication & Names:** TCP/UDP `88` (Kerberos) and `53` (DNS).
 * **File & Policy Transport:** TCP `445` (SMB).
 * Azure Firewall maintains connection tracking tables, verifying bidirectional session state across the Hub boundary while logging every individual transit packet to Azure Log Analytics.
 
-### Zero-Trust Boundary Enforcement & Policy Mutation (`azfw-ssh-deny-allow.jpg`)
+### Zero-Trust Boundary Enforcement & Policy Mutation ([azfw-ssh-deny-allow](./azfw-ssh-deny-allow.jpg))
 To prove that Azure Firewall acts as an active security boundary rather than an uninspected transit bridge:
 * **Implicit Zero-Trust Baseline:** Initial inbound SSH attempts (`TCP 22`) from `DC01` (`10.0.2.4`) to the Spoke 2 Linux host (`10.2.0.4`) hit the default network rule deny action, verifying that all non-whitelisted cross-premises traffic is dropped at the central hub inspection engine.
 * **Deterministic Policy Mutation:** Deploying rule collection `RC-Management` with rule `Allow-OnPrem-SSH` (Priority `205`, TCP `22`, Source: `10.0.2.0/24`, Destination: `10.2.0.0/16`) instantly transitions connection attempts to `Action: Allow` without requiring session resets or changes to the underlying IPsec VPN tunnel configuration.
 
-### Layer-7 Egress Inspection & Domain Filtering (`fqdn-application-filter.jpg`)
+### Layer-7 Egress Inspection & Domain Filtering ([fqdn-application-filter](./fqdn-application-filter.jpg))
 To secure outbound workload communications without granting open internet egress:
 * **UDR-Enforced Egress Redirection:** Spoke 2 subnets route `0.0.0.0/0` directly to the Azure Firewall (`10.3.1.4`), forcing all outbound HTTP/HTTPS sessions into the Layer-7 inspection pipeline.
 * **Granular FQDN Whitelisting:** Azure Firewall evaluates incoming web requests against authorized domain rules. Unapproved destinations (`reddit.com`, `facebook.com`, `x.com`) are dropped at the perimeter.

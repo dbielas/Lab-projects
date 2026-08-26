@@ -1,82 +1,76 @@
-# Enterprise Hybrid Cloud Architecture
+# Hybrid Network Architecture & Centralized Firewall Routing Validation
 
-## Overview
-This repository documents a production-grade hub-and-spoke hybrid network bridging an on-premises Windows Server Active Directory environment (DC01) to multiple Azure VNets via an encrypted IPsec Site-to-Site VPN tunnel routed through a centralized Azure Firewall NVA.
+## Executive Summary
+This directory contains end-to-end evidence validating the deployment, asymmetric route remediation, and stateful security enforcement of a production-grade hybrid cloud landing zone. Rather than relying on direct VNet peering shortcuts, all cross-spoke and hybrid transit traffic is routed through a centralized Azure Firewall NVA, bridging on-premises Active Directory (`DC01`) to Azure spoke workloads over an encrypted IPsec Site-to-Site VPN.
 
 ---
 
-## Topology
+## 1. Environment & Architecture Metadata
+* **On-Premises Hypervisor:** VirtualBox hosting `DC01` (`10.0.2.4`)[cite: 1]
+* **Tunnel Interface:** Windows Server RRAS IPsec S2S over APIPA (`169.254.0.26`)[cite: 1]
+* **Transit Spoke VNet:** `vm-testVNET` (`10.1.0.0/16`) hosting the Virtual Network Gateway (`GatewaySubnet`)[cite: 1]
+* **Central Hub VNet:** Hub (`10.3.0.0/16`) hosting Azure Firewall (`10.3.1.4`)
+* **Workload Spoke VNet:** Spoke 2 (`10.2.0.0/16`)[cite: 1]
 
-```text
-+-------------------------------------------------------------+
-| On-Premises Hypervisor (VirtualBox)                         |
-|   - DC01 / DNS (10.0.2.4)                                   |
-|   - RRAS S2S Interface: Azure-S2S-VPN (169.254.0.26)       |
-+------------------------------+------------------------------+
-                               |
-                   [ IPsec Site-to-Site Tunnel ]
-                               |
-+------------------------------v------------------------------+
-| Azure Spoke 1 / Transit VNet (vm-testVNET - 10.1.0.0/16)    |
-|   - Virtual Network Gateway (GatewaySubnet)                 |
-|   - Workload Subnet (10.1.0.0/24)                           |
-|   - GatewaySubnet UDR (0.0.0.0/0 & Spokes -> Firewall)      |
-+------------------------------+------------------------------+
-                               |
-                    [ Peering with Gateway Transit ]
-                               |
-+------------------------------v------------------------------+
-| Azure Hub VNet (10.3.0.0/16)                                |
-|   - Azure Firewall (10.3.1.4)                               |
-|   - Stateful Inspection & AD Network Rules                  |
-+------------------------------+------------------------------+
-                               |
-                    [ Peering with Use Remote Gateway ]
-                               |
-+------------------------------v------------------------------+
-| Azure Spoke 2 VNet (10.2.0.0/16)                            |
-|   - Workload Subnet (10.2.0.0/24)                           |
-|   - Spoke UDR (0.0.0.0/0 & 10.0.2.0/24 -> Firewall)        |
-+-------------------------------------------------------------+
+---
+
+## 2. Network Topology
+
+```mermaid
+flowchart TD
+    subgraph OnPrem["On-Premises Home Lab (VirtualBox)"]
+        DC01["DC01 / DNS<br>10.0.2.4"]
+        RRAS["RRAS S2S Interface<br>Azure-S2S-VPN (169.254.0.26)"]
+        DC01 --- RRAS
+    end
+
+    subgraph Spoke1["Azure Transit Spoke: vm-testVNET (10.1.0.0/16)"]
+        VNG["Virtual Network Gateway<br>(GatewaySubnet)"]
+        Workload1["Workload Subnet<br>10.1.0.0/24"]
+        UDR_GW["GatewaySubnet UDR<br>0.0.0.0/0 & 10.2.0.0/16 -> 10.3.1.4"]
+        VNG --- UDR_GW
+    end
+
+    subgraph Hub["Azure Hub VNet (10.3.0.0/16)"]
+        AZFW["Azure Firewall<br>10.3.1.4<br>(Inspection & AD Rule Collections)"]
+    end
+
+    subgraph Spoke2["Azure Workload Spoke: Spoke 2 (10.2.0.0/16)"]
+        Workload2["Workload Subnet<br>10.2.0.0/24"]
+        UDR_Spoke2["Spoke UDR<br>0.0.0.0/0 & 10.0.2.0/24 -> 10.3.1.4"]
+        Workload2 --- UDR_Spoke2
+    end
+
+    RRAS <== "IPsec Site-to-Site Tunnel" ==> VNG
+    VNG <== "Peering w/ Gateway Transit" ==> AZFW
+    AZFW <== "Peering w/ Use Remote Gateway" ==> Workload2
 ```
 
 ---
 
-## Architecture & Implementation
+## 3. Evidence Chain of Custody
 
-* **Transit Spoke Design:** `vm-testVNET` (Spoke 1, `10.1.0.0/16`) hosts the Virtual Network Gateway (VNG) while serving dual roles as both an active workload spoke and the hybrid transit network.
-* **Centralized NVA Insertion:** All traffic traversing between `vm-testVNET`, `Spoke 2`, and the on-premises environment is forced through the central Azure Firewall (`10.3.1.4`) via custom User Defined Routes (UDRs).
-* **Hybrid Static Routing:** Persistent static routes are configured on the on-premises RRAS gateway interface to route Azure prefixes (`10.1.0.0/16` and `10.2.0.0/16`) across the IPsec tunnel[cite: 1].
-* **Stateful Identity Policy:** Azure Firewall network rules permit core Active Directory replication and query traffic (DNS, Kerberos, RPC Endpoint Mapper, LDAP, SMB, LDAPS).
+| Step | Source System | Evidence File / Artifact | Key Findings |
+|---|---|---|---|
+| **1. Tunnel Binding** | `DC01` | `route-print.txt` | Persistent routes for `10.1.0.0/16` and `10.2.0.0/16` bound to interface `26` (`169.254.0.26`)[cite: 1] |
+| **2. Gateway Transit** | `vm-testVNET` | `portal-vng-peering.png` | Gateway Transit enabled on peering toward Hub; `GatewaySubnet` UDR routes to Firewall |
+| **3. Firewall Policy** | Azure Firewall | `azfw-rule-collection.png` | `DefaultNetworkRuleCollectionGroup` configured with `RC-Active-Directory-Sync` (Priority `200`) |
+| **4. Port Reachability** | Spoke 2 VM | `spoke2-nc-validation.txt` | `nc -zv 10.0.2.4 <port>` returns open/connected across all required directory service ports |
+| **5. Packet Inspection** | Log Analytics | `azfw-network-rule-log.png` | `AZFWNetworkRule` logs `Action: Allow` on rule `RC-Active-Directory-Sync` for transit flows |
 
 ---
 
-## Validation & Proof of Connectivity
+## 4. Deep-Dive Analysis: Routing & Security Mechanics
 
-### 1. On-Premises Host Routing Table (`route print`)
-```text
-Active Routes:
-Network Destination        Netmask          Gateway       Interface  Metric
-         10.1.0.0      255.255.0.0         On-link      169.254.0.26     35
-         10.2.0.0      255.255.0.0         On-link      169.254.0.26     35
-```
-[cite: 1]
+### Asymmetric Path Mitigation & Host Route Injection
+To enable communication between the on-premises virtual environment and Azure spokes without dropping packets at the stateful firewall plane:
+* **Host Routing:** The Windows host kernel requires explicit persistent routes (`route -p add`) mapping both `10.1.0.0/16` and `10.2.0.0/16` to the APIPA tunnel interface (`169.254.0.26`) to prevent packets from routing to the default gateway[cite: 1].
+* **Gateway Subnet UDR:** A custom route table applied to `GatewaySubnet` forces all ingress cross-premises traffic destined for Spoke 2 (`10.2.0.0/16`) directly to the Azure Firewall (`10.3.1.4`) before reaching workload subnets.
+* **Return Path Integrity:** Spoke subnets utilize a UDR routing `10.0.2.0/24` to the Azure Firewall private IP, ensuring both ingress and egress passes traverse the stateful engine symmetrically.
 
-### 2. End-to-End Port Verification (`nc`)
-```bash
-# Verify Active Directory LDAP reachability
-nc -zv 10.0.2.4 389
-
-# Verify Kerberos authentication reachability
-nc -zv 10.0.2.4 88
-
-# Verify DNS resolution reachability
-nc -zv 10.0.2.4 53
-```
-
-### 3. Azure Firewall Log Analytics Validation (`AZFWNetworkRule`)
-| Source IP | Destination IP | Protocol | Destination Port | Action | Rule |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| 10.2.0.4 | 10.0.2.4 | TCP | 389 | Allow | RC-Active-Directory-Sync |
-| 10.2.0.4 | 10.0.2.4 | TCP | 88 | Allow | RC-Active-Directory-Sync |
-| 10.2.0.4 | 10.0.2.4 | UDP | 53 | Allow | RC-Active-Directory-Sync |
+### Stateful Identity Traffic Inspection (`RC-Active-Directory-Sync`)
+Instead of allowing uninspected network traversal, domain services are explicitly filtered and governed through stateful network rules:
+* **Directory Services:** TCP/UDP `389` (LDAP), `636` (LDAPS), and `135` (RPC Endpoint Mapper).
+* **Authentication & Names:** TCP/UDP `88` (Kerberos) and `53` (DNS).
+* **File & Policy Transport:** TCP `445` (SMB).
+* Azure Firewall maintains connection tracking tables, verifying bidirectional session state across the Hub boundary while logging every individual transit packet to Azure Log Analytics.

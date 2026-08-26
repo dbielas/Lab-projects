@@ -57,6 +57,7 @@ flowchart TD
 | **3. Firewall Policy** | Azure Firewall | [azfw-rule-collection](./azfw-rule-collection.jpg) | `DefaultNetworkRuleCollectionGroup` configured with `RC-Active-Directory-Sync` (Priority `200`) |
 | **4. Port Reachability** | Spoke 2 VM | [spoke2-nc-validation](./spoke2-nc-validation.jpg) | `nc -zv 10.0.2.4 <port>` returns open/connected across all required directory service ports |
 | **5. Packet Inspection** | Log Analytics | [azfw-network-rule-log](./azfw-network-rule-log.jpg) | `AZFWNetworkRule` logs `Action: Allow` on rule `RC-Active-Directory-Sync` for transit flows |
+| **6. Boundary Control & Policy Mutation** | Log Analytics | [azfw-ssh-deny-allow](./azfw-ssh-deny-allow.jpg) | Single query captures implicit `Deny` on unauthorized port 22 inbound from `DC01`, transitioning to `Allow` following the deployment of rule `Allow-OnPrem-SSH`. |
 
 ---
 

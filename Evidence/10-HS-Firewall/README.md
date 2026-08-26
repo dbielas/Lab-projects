@@ -70,7 +70,7 @@ To enable communication between the on-premises virtual environment and Azure sp
 * **Gateway Subnet UDR:** A custom route table applied to `GatewaySubnet` forces all ingress cross-premises traffic destined for Spoke 2 (`10.2.0.0/16`) directly to the Azure Firewall (`10.3.1.4`) before reaching workload subnets.
 * **Return Path Integrity:** Spoke subnets utilize a UDR routing `10.0.2.0/24` to the Azure Firewall private IP, ensuring both ingress and egress passes traverse the stateful engine symmetrically.
 
-### Stateful Identity Traffic Inspection ([spoke2-nc-validation](./spoke2-nc-validation.jpg))
+### Stateful Identity Traffic Inspection ([azfw-rule-collection](./azfw-rule-collection.jpg))
 Instead of allowing uninspected network traversal, domain services are explicitly filtered and governed through stateful network rules:
 * **Directory Services:** TCP/UDP `389` (LDAP), `636` (LDAPS), and `135` (RPC Endpoint Mapper).
 * **Authentication & Names:** TCP/UDP `88` (Kerberos) and `53` (DNS).

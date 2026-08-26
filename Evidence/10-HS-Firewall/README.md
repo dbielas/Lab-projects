@@ -6,11 +6,11 @@ This directory contains end-to-end evidence validating the deployment, asymmetri
 ---
 
 ## 1. Environment & Architecture Metadata
-* **On-Premises Hypervisor:** VirtualBox hosting `DC01` (`10.0.2.4`)[cite: 1]
-* **Tunnel Interface:** Windows Server RRAS IPsec S2S over APIPA (`169.254.0.26`)[cite: 1]
-* **Transit Spoke VNet:** `vm-testVNET` (`10.1.0.0/16`) hosting the Virtual Network Gateway (`GatewaySubnet`)[cite: 1]
+* **On-Premises Hypervisor:** VirtualBox hosting `DC01` (`10.0.2.4`)
+* **Tunnel Interface:** Windows Server RRAS IPsec S2S (`Azure-S2S-VPN`)
+* **Transit Spoke VNet:** `vm-testVNET` (`10.1.0.0/16`) hosting the Virtual Network Gateway (`GatewaySubnet`)
 * **Central Hub VNet:** Hub (`10.3.0.0/16`) hosting Azure Firewall (`10.3.1.4`)
-* **Workload Spoke VNet:** Spoke 2 (`10.2.0.0/16`)[cite: 1]
+* **Workload Spoke VNet:** Spoke 2 (`10.2.0.0/16`)
 
 ---
 

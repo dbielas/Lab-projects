@@ -75,3 +75,8 @@ Instead of allowing uninspected network traversal, domain services are explicitl
 * **Authentication & Names:** TCP/UDP `88` (Kerberos) and `53` (DNS).
 * **File & Policy Transport:** TCP `445` (SMB).
 * Azure Firewall maintains connection tracking tables, verifying bidirectional session state across the Hub boundary while logging every individual transit packet to Azure Log Analytics.
+
+### Zero-Trust Boundary Enforcement & Policy Mutation (`azfw-ssh-deny-allow.jpg`)
+To prove that Azure Firewall acts as an active security boundary rather than an uninspected transit bridge:
+* **Implicit Zero-Trust Baseline:** Initial inbound SSH attempts (`TCP 22`) from `DC01` (`10.0.2.4`) to the Spoke 2 Linux host (`10.2.0.4`) hit the default network rule deny action, verifying that all non-whitelisted cross-premises traffic is dropped at the central hub inspection engine.
+* **Deterministic Policy Mutation:** Deploying rule collection `RC-Management` with rule `Allow-OnPrem-SSH` (Priority `205`, TCP `22`, Source: `10.0.2.0/24`, Destination: `10.2.0.0/16`) instantly transitions connection attempts to `Action: Allow` without requiring session resets or changes to the underlying IPsec VPN tunnel configuration.

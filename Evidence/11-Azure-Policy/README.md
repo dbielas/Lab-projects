@@ -62,7 +62,7 @@ az policy assignment create \
 | **1. Policy as Code** | Azure CLI / ARM | [deny-nic-public-ip](./deny-nic-public-ip.json) | JSON definition enforcing boolean condition against `Microsoft.Network/networkInterfaces/ipConfigurations[*].publicIpAddress.id`. |
 | **2. Policy Assignment** | Azure Portal / CLI | [policy-assignment](./policy-assignment.jpg) | Policy assigned to target resource group `rg-lab-test` with enforcement mode enabled (`Default`). |
 | **3. Preventative Enforcement (Negative Test)** | Azure CLI | [policy-violation-error](./policy-violation-error.jpg) | Deployment of `nic-policy-violation-test` terminated with error `RequestDisallowedByPolicy`. |
-| **4. Compliance Telemetry** | Azure Policy Compliance Blade | [policy-compliance.jpg](./policy-compliance.jpg) | Compliance state verifies active evaluation against existing and newly requested resources. |
+| **4. Compliance Telemetry** | Azure Policy Compliance Blade | [policy-compliance](./policy-compliance.jpg) | Compliance state verifies active evaluation against existing and newly requested resources. |
 
 ---
 
@@ -74,8 +74,8 @@ az policy assignment create \
 
 ```text
 (RequestDisallowedByPolicy) Resource 'nic-policy-violation-test' was disallowed by policy: 'Enforce Private-Only Spoke NICs'.
-Target: /subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/resourceGroups/rg-lab-test/providers/Microsoft.Network/networkInterfaces/nic-policy-violation-test
-Policy Definition ID: /subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/providers/Microsoft.Authorization/policyDefinitions/deny-nic-public-ip
+Target: /subscriptions/<subscription-id>/resourceGroups/rg-lab-test/providers/Microsoft.Network/networkInterfaces/nic-policy-violation-test
+Policy Definition ID: /subscriptions/<subscription-id>/providers/Microsoft.Authorization/policyDefinitions/deny-nic-public-ip
 ```
 
 ### Operational & Architectural Impact

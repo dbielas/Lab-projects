@@ -1,4 +1,4 @@
-# Module 11: Enterprise Landing Zone Guardrails via Azure Policy
+# Enterprise Landing Zone Guardrails via Azure Policy
 
 ## 1. Overview & Architectural Objective
 In an enterprise Hub-and-Spoke topology, workload virtual machines residing in spoke VNets must not be assigned Public IP addresses. Direct public IP assignments bypass centralized security perimeters (Azure Firewall / NVA), expose compute instances directly to the public internet, and introduce asymmetric routing loops when default routes (`0.0.0.0/0`) are enforced via User Defined Routes (UDRs).

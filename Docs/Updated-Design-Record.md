@@ -28,28 +28,29 @@ The organization required an end-to-end hybrid landing zone architecture that se
 
 ## 3. Comprehensive Architectural Topology
 
+```text
 [ ON-PREMISES TIER-0 / EDGE ]
-+-- DC01 (Windows Server 2025 AD DS / DNS: 10.0.2.4) [Azure Arc Connected]
-+-- ENTRA-SYNC01 (Dedicated Sync Host: 10.0.2.5) [PHS / SSPR / TLS 1.2+]
-+-- Edge Gateway / RRAS (Tunnel Interface: 169.254.0.26)
-|
-[ Route-Based IPsec S2S VPN Tunnel / IKEv2 ]
-|
+  +-- DC01 (Windows Server 2025 AD DS / DNS: 10.0.2.4) [Azure Arc Connected]
+  +-- ENTRA-SYNC01 (Dedicated Sync Host: 10.0.2.5) [PHS / SSPR / TLS 1.2+]
+  +-- Edge Gateway / RRAS (Tunnel Interface: 169.254.0.26)
+         |
+    [ Route-Based IPsec S2S VPN Tunnel / IKEv2 ]
+         |
 [ AZURE HYBRID CLOUD FABRIC ]
-+-- Hub-VNet (10.3.0.0/16)
-|     +-- GatewaySubnet (10.3.0.0/24) -> Azure Virtual Network Gateway (VNG)
-|     +-- AzureFirewallSubnet (10.3.1.0/24) -> Azure Firewall Standard (10.3.1.4)
-|           +-- DefaultNetworkRuleCollectionGroup (AD Sync, ICMP, Admin SSH)
-|           +-- DefaultApplicationRuleCollectionGroup (L7 SNI / FQDN Whitelisting)
-|
-+-- VNet Peering (Gateway Transit & Remote Gateway Enabled)
-|
-+-- Spoke 2 VNet: Spoke2-VNet (10.2.0.0/16)
-+-- Workload-Subnet (10.2.0.0/24)
-+-- vm-test (Linux / Private Workload: 10.2.0.4)
-+-- Route Table (UDR): 0.0.0.0/0 -> Next Hop Virtual Appliance (10.3.1.4)
-+-- Azure Policy Guardrail: Deny attachment of Public IPs
-
+  +-- Hub-VNet (10.3.0.0/16)
+  |     +-- GatewaySubnet (10.3.0.0/24) -> Azure Virtual Network Gateway (VNG)
+  |     +-- AzureFirewallSubnet (10.3.1.0/24) -> Azure Firewall Standard (10.3.1.4)
+  |           +-- DefaultNetworkRuleCollectionGroup (AD Sync, ICMP, Admin SSH)
+  |           +-- DefaultApplicationRuleCollectionGroup (L7 SNI / FQDN Whitelisting)
+  |
+  +-- VNet Peering (Gateway Transit & Remote Gateway Enabled)
+  |
+  +-- Spoke 2 VNet: Spoke2-VNet (10.2.0.0/16)
+        +-- Workload-Subnet (10.2.0.0/24)
+              +-- vm-test (Linux / Private Workload: 10.2.0.4)
+              +-- Route Table (UDR): 0.0.0.0/0 -> Next Hop Virtual Appliance (10.3.1.4)
+              +-- Azure Policy Guardrail: Deny attachment of Public IPs
+```
 
 ---
 
@@ -101,17 +102,17 @@ The organization required an end-to-end hybrid landing zone architecture that se
 The complete hybrid architecture is verified across 11 structured evidence modules:
 
 * **Identity & Directory:**
-  * `Evidence/01-Self-Service-Password-Reset/` (SSPR writeback, Event 4724)
-  * `Evidence/02-Password-Hash-Synchronization/` (PHS replication & sync diagnostics)
-  * `Evidence/03-Delta-Synchronization/` (Attribute schema modification pipelines)
-  * `Evidence/04-Account-Deprovisioning/` (Synchronized identity suspension)
+  * `Evidence/01-Self-Service-Password-Reset/` (SSPR writeback, Event 4724)[cite: 2]
+  * `Evidence/02-Password-Hash-Synchronization/` (PHS replication & sync diagnostics)[cite: 2]
+  * `Evidence/03-Delta-Synchronization/` (Attribute schema modification pipelines)[cite: 2]
+  * `Evidence/04-Account-Deprovisioning/` (Synchronized identity suspension)[cite: 2]
 * **Hybrid Operations & Monitoring:**
-  * `Evidence/05-Arc-Agent/` (Arc agent binding, extension manager, heartbeat telemetry)
-  * `Evidence/06-Sentinel/` (AMA ingestion, custom KQL detection, incident triage)
+  * `Evidence/05-Arc-Agent/` (Arc agent binding, extension manager, heartbeat telemetry)[cite: 2]
+  * `Evidence/06-Sentinel/` (AMA ingestion, custom KQL detection, incident triage)[cite: 2]
 * **Network & Security Boundary:**
-  * `Evidence/07-S2S-VPN/` (IPsec transit, AD port netcat testing, cross-boundary SSH)
-  * `Evidence/10-HS-Firewall/` (UDR next-hop interception, stateful AD rules, L7 SNI egress allow/deny)
+  * `Evidence/07-S2S-VPN/` (IPsec transit, AD port netcat testing, cross-boundary SSH)[cite: 2]
+  * `Evidence/10-HS-Firewall/` (UDR next-hop interception, stateful AD rules, L7 SNI egress allow/deny)[cite: 2]
 * **Access Control & Governance:**
-  * `Evidence/08-Conditional-Access/` (MFA enforcement on Azure Management)
-  * `Evidence/09-JIT-PIM/` (Time-bound role activation, approval workflow, auto-revocation)
-  * `Evidence/11-Azure-Policy/` (ARM preventative deny on public NIC provisioning, compliance dashboard)
+  * `Evidence/08-Conditional-Access/` (MFA enforcement on Azure Management)[cite: 2]
+  * `Evidence/09-JIT-PIM/` (Time-bound role activation, approval workflow, auto-revocation)[cite: 2]
+  * `Evidence/11-Azure-Policy/` (ARM preventative deny on public NIC provisioning, compliance dashboard)[cite: 2]

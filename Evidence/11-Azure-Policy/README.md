@@ -9,7 +9,7 @@ This project implements a preventative **Azure Policy Guardrail** assigned at th
 
 ## 2. Policy Definition & Deployment
 
-### Policy Rule Definition (`deny-nic-public-ip.json`)
+### Policy Rule Definition ([deny-nic-public-ip](./deny-nic-public-ip.json))
 The policy inspects resources of type `Microsoft.Network/networkInterfaces` and asserts that the `publicIpAddress.id` property inside the IP configuration array does not exist.
 
 ```json
@@ -59,8 +59,8 @@ az policy assignment create \
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Policy as Code** | Azure CLI / ARM | [deny-nic-public-ip.json](./deny-nic-public-ip.json) | JSON definition enforcing boolean condition against `Microsoft.Network/networkInterfaces/ipConfigurations[*].publicIpAddress.id`. |
-| **2. Policy Assignment** | Azure Portal / CLI | [policy-assignment.jpg](./policy-assignment.jpg) | Policy assigned to target resource group `rg-lab-test` with enforcement mode enabled (`Default`). |
+| **1. Policy as Code** | Azure CLI / ARM | [deny-nic-public-ip](./deny-nic-public-ip.json) | JSON definition enforcing boolean condition against `Microsoft.Network/networkInterfaces/ipConfigurations[*].publicIpAddress.id`. |
+| **2. Policy Assignment** | Azure Portal / CLI | [policy-assignment](./policy-assignment.jpg) | Policy assigned to target resource group `rg-lab-test` with enforcement mode enabled (`Default`). |
 | **3. Preventative Enforcement (Negative Test)** | Azure CLI | [policy-violation-error.txt](./policy-violation-error.txt) | ARM deployment of `nic-policy-violation-test` terminated with error `RequestDisallowedByPolicy`. |
 | **4. Compliance Telemetry** | Azure Policy Compliance Blade | [policy-compliance.jpg](./policy-compliance.jpg) | Compliance state verifies active evaluation against existing and newly requested resources. |
 

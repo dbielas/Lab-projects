@@ -1,69 +1,64 @@
-# Azure Hybrid Active Directory Infrastructure Lab
+# Module 07: Cross-Premises IPsec S2S Transit, DNS Resolution & Hybrid Join Validation
 
-## Overview
-This repository contains the architecture and validation evidence for a hybrid Active Directory environment. The infrastructure bridges an on-premises network with an Azure Virtual Network (VNet) via a Site-to-Site (S2S) IPsec VPN tunnel. This enables secure cross-premises DNS resolution, domain-joined workloads, and identity synchronization via Microsoft Entra Connect.
+## Executive Summary
+This directory contains end-to-end architectural and operational validation of a route-based IPsec Site-to-Site (S2S) VPN tunnel connecting an on-premises Active Directory environment (`hybrid.lan`) to an Azure Virtual Network (`10.1.0.0/16`). It demonstrates secure cross-boundary Layer 3 routing, stateful directory service port reachability, hybrid name resolution, Linux domain integration, and Windows Hybrid Entra Join synchronization.
 
-## 1. Architecture & Topology
+---
 
-### Network Diagram
+## 1. Architecture & IPAM Topology
+
+### Network Topology
 ```mermaid
 graph TD
-    subgraph "On-Premises Network"
-        DC01[DC01<br>AD DS / DNS<br>10.0.2.4]
-        SYNC[ENTRA-SYNC01<br>Entra Connect<br>10.0.2.5]
-        CPE[(On-Prem VPN Gateway)]
+    subgraph OnPrem["On-Premises Infrastructure (10.0.2.0/24)"]
+        DC01["DC01 / DNS<br>10.0.2.4"]
+        SYNC["ENTRA-SYNC01<br>Entra Connect<br>10.0.2.5"]
+        CPE["Edge Gateway / RRAS<br>169.254.0.26"]
+        DC01 --- CPE
+        SYNC --- CPE
     end
 
-    subgraph "Azure Cloud (vnet-hybrid-core)"
-        VNG[vng-hybrid-core<br>Virtual Network Gateway<br>PIP: pip-vng-hybrid]
-        VM[vm-test<br>Linux Workload<br>10.1.1.4]
+    subgraph Azure["Azure Core VNet: vm-testVNET (10.1.0.0/16)"]
+        VNG["Virtual Network Gateway<br>GatewaySubnet (10.1.255.0/27)"]
+        VM["vm-test<br>Linux Workload<br>10.1.1.4"]
+        VNG --- VM
     end
 
-    DC01 -.- CPE
-    SYNC -.- CPE
-    VNG -.- VM
-
-    CPE <-->|IPsec S2S Tunnel| VNG
+    CPE <== "Route-Based IPsec Tunnel (IKEv2)" ==> VNG
 ```
 
 ### IP Address Management (IPAM)
-| Hostname | Role | IP Address |
-| :--- | :--- | :--- |
-| **DC01** | Primary Domain Controller & DNS | `10.0.2.4` |
-| **ENTRA-SYNC01** | Microsoft Entra Connect Sync Server | `10.0.2.5` |
-| **vng-hybrid-core** | Virtual Network Gateway | `pip-vng-hybrid` / `GatewaySubnet` `10.1.255.0/27` |
-| **vm-test** | Domain-Joined Workload (Linux) | `10.1.1.4` |
+| Hostname / Node | Role | Subnet / Interface | IP Address |
+|---|---|---|---|
+| **`DC01`** | Primary Domain Controller & DNS | `10.0.2.0/24` | `10.0.2.4` |
+| **`ENTRA-SYNC01`** | Entra Connect Sync Engine | `10.0.2.0/24` | `10.0.2.5` |
+| **`Azure-S2S-VPN`** | On-Premises Tunnel Interface | APIPA Point-to-Point | `169.254.0.26` |
+| **`vng-hybrid-core`** | Azure Virtual Network Gateway | `GatewaySubnet` (`10.1.255.0/27`) | Dynamic Private / Public IP |
+| **`vm-test`** | Hybrid Domain-Joined Linux Node | Workload Subnet (`10.1.1.0/24`) | `10.1.1.4` |
+
+---
 
 ## 2. Evidence Chain of Custody
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **01. S2S Tunnel Establishment** | Azure Portal | [vpn-gateway-status](./vpn-gateway-status.jpg) | Confirmed S2S tunnel connectivity and bi-directional data flow between on-premises and Azure. |
-| **02. Layer 3 Routing Validation** | `DC01` | [tracert-to-azure-vm](./tracert-to-azure-vm.txt) | Validated Layer 3 routing across the IPsec tunnel from the on-premises network to the Azure VNet. |
-| **03. Remote Access Verification** | Local Workstation | [ssh-session-vm-test](./ssh-session-vm-test.jpg) | Verified remote administrative access to `vm-test` via SSH over the private IPsec tunnel. |
-| **04. Cross-Premises DNS Resolution** | `vm-test` | [dig-hybrid-lan](./dig-hybrid-lan.jpg) | Confirmed Azure workload resolution of the local Active Directory domain (`hybrid.lan`) via `DC01`. |
-| **05. AD Port Reachability** | `vm-test` | [nc-ad-ports-check](./nc-ad-ports-check.jpg) | Proved Network Security Group (NSG) allowances for Active Directory LDAP and Kerberos traffic. |
-| **06. Hybrid Domain Integration** | `DC01` (ADUC) / `vm-test` | [aduc-vm-test-object](./aduc-vm-test-object.jpg) / [aduc-vm-test-object](./aduc-vm-test-object1.jpg) | Demonstrated successful hybrid domain join of the Linux workload into the local Active Directory. |
-| **07. Identity Sync & Filtering** | `ENTRA-SYNC01` | [ssm-export](./SSM-EXPORT.JPG) | Verified object ingestion into the Active Directory Connector Space and demonstrated default Entra Connect OS filtering rules for non-native workloads. |
-| **08. Hybrid Device Registration** | Azure Portal / `ENTRA-SYNC01`| [entra-hybrid-join-status](./entra-hybrid-join-status.jpg) / [entra-import-sync](./winvm-sync-import.jpg) | Verified successful Hybrid Microsoft Entra join and synchronization of a standard Windows production workload to the cloud tenant. |
-
-## 3. Tunnel Health & Layer 3 Routing
-*   **Gateway Status:** *(Insert screenshot: Azure Portal showing the VPN Connection status as "Connected" with visible "Data in" and "Data out" metrics)*
-*   **Trace Routing:** *(Insert text/screenshot: Output of `tracert 10.1.1.4` from `DC01` showing ICMP packets correctly routing through the on-premises gateway and across the IPsec tunnel)*
-*   **SSH Validation:** *(Insert screenshot: Terminal successfully SSH'd into the Linux VM `10.1.1.4` from the local network)*
-
-## 4. Name Resolution & Core Services
-Hybrid AD relies entirely on flawless DNS. This validates that the Azure VNet can communicate with the domain controller:
-
-*   **Cross-Premises DNS:** *(Insert text/screenshot: Output of `dig @10.0.2.4 hybrid.lan +short` from the Linux VM)*
-*   **Port Validation:** *(Insert text: Output of `nc -zv 10.0.2.4 389` (LDAP) and `nc -zv 10.0.2.4 88` (Kerberos) from the Linux VM proving NSGs and firewalls allow AD traffic)*
-
-## 5. Domain Integration
-This serves as the ultimate proof of the hybrid connection working:
-
-*   **Active Directory Computer Object:** *(Insert screenshot: Active Directory Users and Computers (ADUC) on `DC01` showing the `vm-test` computer object populated in the correct Organizational Unit)*
-*   **Entra Connect Sync:** *(Insert CSV/screenshot: Synchronization Service Manager on `ENTRA-SYNC01` showing a successful "Export" operation to Azure AD)*
+| **01. S2S Tunnel State** | Azure Portal / VNG | [vpn-gateway-status](./vpn-gateway-status.jpg) | Confirmed active S2S connection status (`Connected`) with bidirectional telemetry across the gateway plane. |
+| **02. Layer 3 Routing** | `DC01` | [tracert-to-azure-vm](./tracert-to-azure-vm.txt) | Executed `tracert 10.1.1.4`; verified packet egress over the S2S interface to the Azure workload subnet without routing loops. |
+| **03. Private Remote Access** | Workstation / VPN | [ssh-session-vm-test](./ssh-session-vm-test.jpg) | Established direct interactive SSH management session to `vm-test` (`10.1.1.4`) over the private encrypted tunnel. |
+| **04. Cross-Premises DNS** | `vm-test` (`10.1.1.4`) | [dig-hybrid-lan](./dig-hybrid-lan.jpg) | Executed `dig @10.0.2.4 hybrid.lan +short`; confirmed cloud-to-on-premises DNS resolution of the local domain. |
+| **05. AD Port Validation** | `vm-test` (`10.1.1.4`) | [nc-ad-ports-check](./nc-ad-ports-check.jpg) | Executed `nc -zv 10.0.2.4 389` (LDAP) and `88` (Kerberos); verified network paths and security list rules allow core directory traffic. |
+| **06. Domain Machine Account** | `DC01` (ADUC) | [aduc-vm-test-object](./aduc-vm-test-object.jpg) / [aduc-vm-test-object1](./aduc-vm-test-object1.jpg) | Verified provisioned `vm-test` computer object inside target Active Directory OU (`OU=Computers,OU=Synced_Objects`). |
+| **07. Sync Scope Filtering** | `ENTRA-SYNC01` | [SSM-EXPORT](./SSM-EXPORT.JPG) | Synchronization Service Manager demonstrates non-Windows Linux computer object staging and default Entra Connect OS filtering. |
+| **08. Hybrid Join Lifecycle** | Entra Admin Center / Sync | [entra-hybrid-join-status](./entra-hybrid-join-status.jpg) / [winvm-sync-import](./winvm-sync-import.jpg) | Verified synchronization and successful registration of hybrid domain-joined Windows production devices in Microsoft Entra ID. |
 
 ---
-**Troubleshooting Notes:** 
-*   **Bastion Bypass:** During initial configuration, the Azure Bastion Developer SKU experienced a regional DNS resolution failure (`NODATA` response from Traffic Manager). Management operations were successfully rerouted through the Site-to-Site VPN as an out-of-band management fallback.
+
+## 3. Deep-Dive Technical Analysis
+
+### Tunnel Mechanics & Layer 3 Routing
+* **Route-Based IPsec Transit:** Tunnel negotiation leverages IKEv2 with static host routes injected on `DC01` (`route -p add 10.1.0.0/16 if 26`), directing Azure-destined packets into the RRAS tunnel interface.
+* **Out-of-Band Bastion Workaround:** When Azure Bastion (Developer SKU) experienced regional DNS resolution drops during staging, the private Site-to-Site VPN provided immediate out-of-band SSH/RDP management reachability directly over private IP space.
+
+### Identity Boundary Integration
+* **Kerberos & Name Resolution:** Linux workload integration requires bidirectional DNS translation and open Layer-4 paths for Kerberos ticket issuance (`TCP/UDP 88`) and LDAP directory lookups (`TCP/UDP 389`).
+* **Entra Filtering:** Entra Connect evaluates incoming computer objects. Standard Windows endpoints complete registration via Hybrid Entra Join, whereas non-native workloads (`vm-test`) are filtered or managed via private directory boundaries to prevent tenant staging clutter.

@@ -17,7 +17,7 @@ This directory contains end-to-end evidence validating Password Hash Synchroniza
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Tenant Feature Baseline** | Microsoft Entra Admin Center | [entra-phs-status](./entra-phs-status.jpg) | Confirmed `Password Hash Sync: Enabled` and `Sync status: Enabled` under Provision from Active Directory. |
+| **1. Tenant Feature Baseline** | Microsoft Entra Admin Center | [entra-phs-status](./PHS_Entra.jpg) | Confirmed `Password Hash Sync: Enabled` and `Sync status: Enabled` under Provision from Active Directory. |
 | **2. Local Password Mutation** | `DC01` | [dc01-phs-reset](./dc01-phs-reset.txt) | `Set-ADAccountPassword` executed; `pwdLastSet` updated. |
 | **3. Sync Engine Harvest** | `ENTRA-SYNC01` | [sync-diagnostics](./sync-diagnostics.jpg) | `Invoke-ADSyncDiagnostics` returned `Success` across local sync boundaries and RPC replication endpoints. |
 | **4. Cloud Ingestion Audit** | Entra ID Portal | [entra-audit-log](./entra-audit-log.csv) | Status: `Success` (`Update PasswordProfile`) processed automatically by `ConnectSyncProvisioning_ENTRA-SYNC01_*`. |

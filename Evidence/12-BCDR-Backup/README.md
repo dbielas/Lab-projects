@@ -16,7 +16,7 @@ The deployment validates:
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
 | **1. Vault Provisioning** | Azure CLI / ARM | [rsv-properties.json](./rsv-properties.json) | Recovery Services Vault `rsv-hybrid-bcdr` deployed in `rg-lab-test` with `LocallyRedundant` storage baseline. |
-| **2. Snapshot Execution** | RSV Backup Jobs | [backup-job-success.jpg](./backup-job-success.jpg) | On-demand application-consistent snapshot completed successfully for `vm-test`. |
+| **2. Snapshot Execution** | RSV Backup Item (`vm-test`) | [backup-job-success.jpg](./backup-job-success.jpg) | Backup Pre-Check passed with status `Success`; created 1 `File-system Consistent` recovery point (`Snapshot and Vault-Standard`) under `DefaultPolicy`. |
 | **3. Item-Level Recovery & Cryptographic Verification** | `vm-test` (`10.2.0.4`) / iSCSI Snapshot | [sha256sum.jpg](./sha256sum.jpg) | Mounted point-in-time snapshot partition (`/home/azureuser/vm-test-20260828033247/Volume1/`); SHA-256 checksum comparison confirms 100% data integrity against pre-backup baseline (`8d85dcc7b8b9d837d3315f887883c667c801e6c672dd61ed191ecc7f61c3067d`). |
 
 ---

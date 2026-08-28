@@ -1,4 +1,4 @@
-# ADR-001: Enterprise Hybrid Cloud Architecture, Zero-Trust Perimeter & Governance Fabric
+# Enterprise Hybrid Cloud Architecture, Zero-Trust Perimeter & Governance Fabric
 
 * **Status:** Approved / Fully Implemented
 * **Date:** August 2026

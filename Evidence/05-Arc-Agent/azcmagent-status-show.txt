@@ -1,9 +1,9 @@
 Resource Name                           : DC01
 Resource Group Name                     : rg-hybrid-arc
 Resource Namespace                      : Microsoft.HybridCompute
-Resource Id                             : /subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/DC01
-Subscription ID                         : 6d04a6ec-6ce4-4637-a497-b8479df4c5b8
-Tenant ID                               : 2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6
+Resource Id                             : /subscriptions/<subscription-id>/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/DC01
+Subscription ID                         : <subscription-id>
+Tenant ID                               : <tenant-id>
 VM ID                                   : 7e16884a-095e-4373-acb1-9a31f8e63f6a
 Correlation ID                          : 6ca2fd59-3fc3-47b3-af3d-e20d4196ff04
 VM UUID                                 : 4D52E70F-993E-4245-A0D5-FB051E2C70D0
@@ -34,16 +34,16 @@ Dependent Service Status
   Extension Service (extensionservice)  : running
   GC Service (gcarcservice)             : running
   SMS Agent Host (CcmExec)              : unknown
-Portal Page                             : https://portal.azure.com/#@2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6/resource/subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/DC01/overview
+Portal Page                             : https://portal.azure.com/#@2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6/resource/subscriptions/<subscription-id>/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/DC01/overview
 Disabled Features                       : 
 Agent Auto Upgrade Task Status          : enabled, id: {E8B2AE8B-0F04-4D44-A090-D82D72158E82}
 
 Resource Name                           : ENTRA-SYNC01
 Resource Group Name                     : rg-hybrid-arc
 Resource Namespace                      : Microsoft.HybridCompute
-Resource Id                             : /subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/ENTRA-SYNC01
-Subscription ID                         : 6d04a6ec-6ce4-4637-a497-b8479df4c5b8
-Tenant ID                               : 2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6
+Resource Id                             : /subscriptions/<subscription-id>/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/ENTRA-SYNC01
+Subscription ID                         : <subscription-id>
+Tenant ID                               : <tenant-id>
 VM ID                                   : 7ee2aba3-784d-42ed-9e9d-f000928e1a05
 Correlation ID                          : b9a85273-5716-480c-9db4-3f2627cf5f92
 VM UUID                                 : F2834682-2471-4129-AE44-FA0E5140D0F5
@@ -74,7 +74,7 @@ Dependent Service Status
   Extension Service (extensionservice)  : running
   GC Service (gcarcservice)             : running
   SMS Agent Host (CcmExec)              : unknown
-Portal Page                             : https://portal.azure.com/#@2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6/resource/subscriptions/6d04a6ec-6ce4-4637-a497-b8479df4c5b8/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/ENTRA-SYNC01/overview
+Portal Page                             : https://portal.azure.com/#@2fc99342-e81e-4f70-9a4d-ad5dc6ac38b6/resource/subscriptions/<subscription-id>/resourceGroups/rg-hybrid-arc/providers/Microsoft.HybridCompute/machines/ENTRA-SYNC01/overview
 Disabled Features                       : 
 Agent Auto Upgrade Task Status          : enabled, id: {F34B9DCF-3357-4128-8662-0391F26EFA48}
 

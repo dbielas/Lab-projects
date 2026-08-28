@@ -1,4 +1,4 @@
-# Module 07: Cross-Premises IPsec S2S Transit, DNS Resolution & Hybrid Join Validation
+# Cross-Premises IPsec S2S Transit, DNS Resolution & Hybrid Join Validation
 
 ## Executive Summary
 This directory contains end-to-end architectural and operational validation of a route-based IPsec Site-to-Site (S2S) VPN tunnel connecting an on-premises Active Directory environment (`hybrid.lan`) to an Azure Virtual Network (`10.1.0.0/16`). It demonstrates secure cross-boundary Layer 3 routing, stateful directory service port reachability, hybrid name resolution, Linux domain integration, and Windows Hybrid Entra Join synchronization.

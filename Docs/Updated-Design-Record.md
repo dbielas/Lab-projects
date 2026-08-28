@@ -3,15 +3,15 @@
 * **Status:** Approved / Fully Implemented
 * **Date:** August 2026
 * **Author:** David Bielas (Lead Infrastructure & Cloud Security Engineering)
-* **Scope:** Hybrid Enterprise Architecture (On-Premises Windows Server 2025 Tier-0 / Edge <--> Azure Hub-and-Spoke Transit, SecOps & Landing Zone Guardrails)
+* **Scope:** Hybrid Enterprise Architecture (On-Premises Windows Server 2025 Tier-0 / Edge <--> Azure Hub-and-Spoke Transit, SecOps, Governance & BCDR)
 
 ---
 
 ## 1. Context and Problem Statement
 
-Modern enterprise hybrid transformations fail when cloud adoption introduces fragmented identity silos, uncontrolled edge routing, default-allow egress points, standing administrative privileges, and reactive compliance auditing.
+Modern enterprise hybrid transformations fail when cloud adoption introduces fragmented identity silos, uncontrolled edge routing, default-allow egress points, standing administrative privileges, and unverified disaster recovery.
 
-The organization required an end-to-end hybrid landing zone architecture that seamlessly connects an on-premises Tier-0 Windows Server 2025 infrastructure to Microsoft Entra ID and Azure IaaS workloads. The architecture must enforce Tier-0 control plane isolation, private non-transitive network routing, stateful Layer-4/7 perimeter inspection, unified hybrid threat monitoring, zero standing privileges, and policy-as-code landing zone governance.
+The organization required an end-to-end hybrid landing zone architecture connecting an on-premises Tier-0 Windows Server 2025 infrastructure to Microsoft Entra ID and Azure IaaS workloads. The architecture must enforce Tier-0 control plane isolation, private non-transitive network routing, stateful Layer-4/7 perimeter inspection, unified hybrid threat monitoring, zero standing privileges, policy-as-code landing zone governance, and cryptographic BCDR validation.
 
 ---
 
@@ -23,6 +23,7 @@ The organization required an end-to-end hybrid landing zone architecture that se
 * **Pillar 4: Unified Threat Observability & SecOps Automation:** Bridge on-premises Tier-0 servers with cloud telemetry via Azure Arc and Azure Monitor Agent (AMA), streaming into Microsoft Sentinel for SIEM detection.
 * **Pillar 5: Identity Governance & Privileged Access Management:** Eliminate standing administrator access using time-bound Just-In-Time (JIT) Privileged Identity Management (PIM) and MFA-enforced Conditional Access.
 * **Pillar 6: Shift-Left Governance (Policy-as-Code):** Enforce preventative landing zone controls at the Azure Resource Manager (ARM) control plane to programmatically block architectural violations.
+* **Pillar 7: Workload Resilience & Cryptographic Recovery (BCDR):** Establish cloud-native snapshot management with item-level recovery and hash verification to ensure zero-data-loss recovery targets.
 
 ---
 
@@ -50,6 +51,7 @@ The organization required an end-to-end hybrid landing zone architecture that se
               +-- vm-test (Linux / Private Workload: 10.2.0.4)
               +-- Route Table (UDR): 0.0.0.0/0 -> Next Hop Virtual Appliance (10.3.1.4)
               +-- Azure Policy Guardrail: Deny attachment of Public IPs
+              +-- Recovery Services Vault: App-consistent snapshots & iSCSI recovery
 ```
 
 ---
@@ -81,6 +83,11 @@ The organization required an end-to-end hybrid landing zone architecture that se
 * **Preventative Control Plane Enforcement:** Deployed custom Azure Policy (`deny-nic-public-ip.json`) assigned at the workload resource group scope.
 * **Deterministic Request Denial:** ARM blocks the provisioning of any Network Interface (NIC) with an attached Public IP (`RequestDisallowedByPolicy`), enforcing zero-direct-internet exposure on spoke workloads and eliminating asymmetric routing bypasses.
 
+### F. Business Continuity & Cryptographic Verification (Azure Backup)
+* **Policy-Driven Snapshot Orchestration:** Deployed an Azure Recovery Services Vault (`rsv-hybrid-bcdr`) utilizing Locally Redundant Storage (LRS) to capture application-consistent VM snapshots on isolated spoke subnets.
+* **Non-Destructive Item-Level Recovery:** Exposes snapshot blocks via an authenticated, time-bound iSCSI mount session, allowing granular file recovery without system downtime.
+* **Cryptographic Verification:** Restored payload integrity is validated via end-to-end SHA-256 hash checks matching the pre-backup baseline.
+
 ---
 
 ## 5. Architectural Trade-offs & Decision Matrix
@@ -93,26 +100,27 @@ The organization required an end-to-end hybrid landing zone architecture that se
 | **Inbound Access** | Zero Public IPs; Bastion / S2S VPN only | Direct RDP/SSH exposed to the Internet |
 | **SIEM & Logging** | Arc + AMA streaming Event Logs to Sentinel | Disconnected local Windows Event Viewer |
 | **Privileged Access** | Just-In-Time (JIT) PIM with MFA & Approval | Permanent standing Global Admin assignments |
-| **Policy Enforcement** | Pre-flight ARM API rejection via Azure Policy | Post-incident manual security audits |
+| **Policy Enforcement**| Pre-flight ARM API rejection via Azure Policy | Post-incident manual security audits |
+| **Disaster Recovery** | Point-in-time iSCSI mount + SHA-256 verification | Full destructive VM redeployment without integrity checks |
 
 ---
 
 ## 6. Implementation Validation & Evidence Traceability
 
-The complete hybrid architecture is verified across 11 structured evidence modules:
-
 * **Identity & Directory:**
-  * `Evidence/01-Self-Service-Password-Reset/` (SSPR writeback, Event 4724)[cite: 2]
-  * `Evidence/02-Password-Hash-Synchronization/` (PHS replication & sync diagnostics)[cite: 2]
-  * `Evidence/03-Delta-Synchronization/` (Attribute schema modification pipelines)[cite: 2]
-  * `Evidence/04-Account-Deprovisioning/` (Synchronized identity suspension)[cite: 2]
+  * `Evidence/01-Self-Service-Password-Reset/` (SSPR writeback, Event 4724)
+  * `Evidence/02-Password-Hash-Synchronization/` (PHS replication & sync diagnostics)
+  * `Evidence/03-Delta-Synchronization/` (Attribute schema modification pipelines)
+  * `Evidence/04-Account-Deprovisioning/` (Synchronized identity suspension)
 * **Hybrid Operations & Monitoring:**
-  * `Evidence/05-Arc-Agent/` (Arc agent binding, extension manager, heartbeat telemetry)[cite: 2]
-  * `Evidence/06-Sentinel/` (AMA ingestion, custom KQL detection, incident triage)[cite: 2]
+  * `Evidence/05-Arc-Agent/` (Arc agent binding, extension manager, heartbeat telemetry)
+  * `Evidence/06-Sentinel/` (AMA ingestion, custom KQL detection, incident triage)
 * **Network & Security Boundary:**
-  * `Evidence/07-S2S-VPN/` (IPsec transit, AD port netcat testing, cross-boundary SSH)[cite: 2]
-  * `Evidence/10-HS-Firewall/` (UDR next-hop interception, stateful AD rules, L7 SNI egress allow/deny)[cite: 2]
+  * `Evidence/07-S2S-VPN/` (IPsec transit, AD port netcat testing, cross-boundary SSH)
+  * `Evidence/10-HS-Firewall/` (UDR next-hop interception, stateful AD rules, L7 SNI egress allow/deny)
 * **Access Control & Governance:**
-  * `Evidence/08-Conditional-Access/` (MFA enforcement on Azure Management)[cite: 2]
-  * `Evidence/09-JIT-PIM/` (Time-bound role activation, approval workflow, auto-revocation)[cite: 2]
-  * `Evidence/11-Azure-Policy/` (ARM preventative deny on public NIC provisioning, compliance dashboard)[cite: 2]
+  * `Evidence/08-Conditional-Access/` (MFA enforcement on Azure Management)
+  * `Evidence/09-JIT-PIM/` (Time-bound role activation, approval workflow, auto-revocation)
+  * `Evidence/11-Azure-Policy/` (ARM preventative deny on public NIC provisioning, compliance dashboard)
+* **Resilience & BCDR:**
+  * `Evidence/12-BCDR-Backup/` (RSV deployment, filesystem-consistent snapshots, SHA-256 hash validation)

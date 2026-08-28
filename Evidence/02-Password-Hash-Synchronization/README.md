@@ -17,23 +17,23 @@ This directory contains end-to-end evidence validating Password Hash Synchroniza
 
 | Step | Source System | Evidence File / Artifact | Key Findings |
 |---|---|---|---|
-| **1. Local Reset** | `DC01` | [dc01-phs-reset](./dc01-phs-reset.txt) | `Set-ADAccountPassword` executed; `pwdLastSet` updated |
-| **2. Engine Harvest** | `ENTRA-SYNC01` | [sync-diagnostics](./sync-diagnostics.jpg) | `Invoke-ADSyncDiagnostics` returned `Success` |
-| **3. Processing** | `ENTRA-SYNC01` | `phs-operational-event.png` | Local batch extracted and hashed via HMAC-SHA256 |
-| **4. Cloud Ingestion** | Entra ID Portal | [entra-audit-log](./entra-audit-log.csv) | Status: `Success` (`Update PasswordProfile`) initiated by `ConnectSyncProvisioning_ENTRA-SYNC01_*` |
+| **1. Tenant Feature Baseline** | Microsoft Entra Admin Center | [entra-phs-status](./entra-phs-status.jpg) | Confirmed `Password Hash Sync: Enabled` and `Sync status: Enabled` under Provision from Active Directory. |
+| **2. Local Password Mutation** | `DC01` | [dc01-phs-reset](./dc01-phs-reset.txt) | `Set-ADAccountPassword` executed; `pwdLastSet` updated. |
+| **3. Sync Engine Harvest** | `ENTRA-SYNC01` | [sync-diagnostics](./sync-diagnostics.jpg) | `Invoke-ADSyncDiagnostics` returned `Success` across local sync boundaries and RPC replication endpoints. |
+| **4. Cloud Ingestion Audit** | Entra ID Portal | [entra-audit-log](./entra-audit-log.csv) | Status: `Success` (`Update PasswordProfile`) processed automatically by `ConnectSyncProvisioning_ENTRA-SYNC01_*`. |
 
 ---
 
 ## 3. Deep-Dive Analysis: Security & Pipeline Mechanics
 
 ### Cryptographic Handling & Transport
-When an on-premises password change occurs on `DC01`, the raw password hash is extracted via DSGetNCChanges API (Directory Replication Services).
-* The MD4-based NT hash is re-hashed using **HMAC-SHA256** with a per-batch generated cryptographic key before leaving local memory.
+When an on-premises password change occurs on `DC01`, the raw password hash is extracted via the `DSGetNCChanges` API (Directory Replication Services):
+* The MD4-based NT hash is re-hashed using **HMAC-SHA256** with a per-batch generated cryptographic key before leaving local host memory.
 * High-frequency sync passes occur on a **2-minute background interval**, operating independently of standard 30-minute delta attribute sync cycles.
-* Transmitted securely over outbound **TLS 1.2 / HTTPS (Port 443)** directly to the Microsoft Entra identity endpoint.
+* Transmitted securely over outbound **TLS 1.2+ / HTTPS (Port 443)** directly to the Microsoft Entra identity endpoint.
 
 ### Role & Identity Context (`ConnectSyncProvisioning`)
-Unlike manual administrative password resets or end-user cloud SSPR operations, inbound PHS writes do not generate interactive user logs.
+Unlike manual administrative password resets or end-user cloud SSPR operations, inbound PHS writes do not generate interactive user logs:
 * Changes are processed automatically under the service principal identity: **`ConnectSyncProvisioning_ENTRA-SYNC01_*`**.
 * In the Entra Audit Logs, the event registers under **Service:** `Core Directory` with **Activity:** `Update PasswordProfile`.
 * Validates that background credential synchronization operates seamlessly without requiring administrative delegation or manual password resets in the cloud portal.
